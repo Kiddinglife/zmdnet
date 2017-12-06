@@ -1,0 +1,7 @@
+
+srcfiles = Split(
+    """
+        ../../src/test.c 
+    """)
+StaticLibrary('zmdnet', srcfiles, CPPPATH = '../../src')
+Decider('MD5-timestamp')

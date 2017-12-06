@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+# cmake build
+/builds
+/_builds
+/build
+/_build
