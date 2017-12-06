@@ -32,24 +32,24 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>docx</name>
-			<type>2</type>
-			<location>/home/jackiez/eclipse-oxygen-workspace/zmdnet/docx</location>
+			<name>SConstruct</name>
+			<type>1</type>
+			<location>/home/jackiez/eclipse-workspace/zmdnet/SConstruct</location>
 		</link>
 		<link>
-			<name>sample</name>
+			<name>doc</name>
 			<type>2</type>
-			<location>/home/jackiez/eclipse-oxygen-workspace/zmdnet/sample</location>
+			<location>/home/jackiez/eclipse-workspace/zmdnet/doc</location>
 		</link>
 		<link>
 			<name>src</name>
 			<type>2</type>
-			<location>/home/jackiez/eclipse-oxygen-workspace/zmdnet/src</location>
+			<location>/home/jackiez/eclipse-workspace/zmdnet/src</location>
 		</link>
 		<link>
 			<name>test</name>
 			<type>2</type>
-			<location>/home/jackiez/eclipse-oxygen-workspace/zmdnet/test</location>
+			<location>/home/jackiez/eclipse-workspace/zmdnet/test</location>
 		</link>
 	</linkedResources>
 </projectDescription>
