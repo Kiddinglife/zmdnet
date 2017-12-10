@@ -36,11 +36,15 @@
 /_builds
 /build
 /_build
-/CMakeFiles
 CMakeCache.txt
-CMakeList.txt
+CMakeFiles
+CMakeScripts
+Testing
 Makefile
 cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
 
 # Prerequisites
 *.d
