@@ -36,6 +36,7 @@
 /_builds
 /build
 /_build
+/CMakeFiles
 
 # Prerequisites
 *.d

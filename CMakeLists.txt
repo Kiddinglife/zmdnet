@@ -131,6 +131,7 @@ if (have_sa_len)
 	add_definitions(-DHAVE_SA_LEN)
 endif ()
 
+
 check_struct_has_member("struct sockaddr_in" "sin_len" "sys/types.h;netinet/in.h" have_sin_len)
 if (have_sin_len)
 	message(STATUS "have_sin_len")
