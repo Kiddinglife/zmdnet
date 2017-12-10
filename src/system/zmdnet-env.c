@@ -24,16 +24,18 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  */
 
+#include "zmdnet-env.h"
+
+#include "../config.h"
+
+#ifndef _WIN32
+#include <stdint.h>
+#include "zmdnet-os-user-space.h"
+#endif
+
 #include <sys/types.h>
 #include <stdlib.h>
 #include <string.h>
-
-#if !defined (__WIN32__)
-#include <stdint.h>
-#include "zmdnet-user-space.h"
-#endif
-
-#include "zmdnet-env.h"
 
 /* #include <sys/param.h> defines MIN */
 #if !defined(MIN)

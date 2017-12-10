@@ -46,23 +46,27 @@ include(CheckCCompilerFlag)
 # CHECK OPTIONS
 #################################################
 
-option(RUN_TIME_CHECK "Add runtime checks" 0)
-if (RUN_TIME_CHECK)
-	add_definitions(-DRUN_TIME_CHECK)
+option(RUN_TIME_CHECKS "Add runtime checks" 1)
+if (RUN_TIME_CHECKS)
+	message(STATUS "RUN_TIME_CHECKS")
+	add_definitions(-DRUN_TIME_CHECKS)
 endif ()
 
 option(ZMDNET_DEBUG "Provide debug information" 1)
 if (ZMDNET_DEBUG)
+	message(STATUS "ZMDNET_DEBUG")
 	add_definitions(-DZMDNET_DEBUG)
 endif ()
 
 option(ZMDNET_SUPPORT_IPV4 "Support IPv4" 1)
 if (ZMDNET_SUPPORT_IPV4)
+	message(STATUS "ZMDNET_SUPPORT_IPV4")
 	add_definitions(-DZMDNET_SUPPORT_IPV4)
 endif ()
 
 option(ZMDNET_SUPPORT_IPV6 "Support IPv6" 1)
 if (ZMDNET_SUPPORT_IPV6)
+	message(STATUS "ZMDNET_SUPPORT_IPV6")
 	add_definitions(-DZMDNET_SUPPORT_IPV6)
 endif ()
 
@@ -87,29 +91,38 @@ endif ()
 #################################################
 # CHECK FOR TYPES AND FUNCTIONS
 #################################################
-
 check_include_files("sys/queue.h" have_sys_queue_h)
 if (have_sys_queue_h)
+	message(STATUS "HAVE_SYS_QUEUE_H")
+	option(HAVE_SYS_QUEUE_H "HAVE_SYS_QUEUE_H")
 	add_definitions(-DHAVE_SYS_QUEUE_H)
 endif ()
 
 check_include_files("sys/socket.h;linux/if_addr.h" have_linux_if_addr_h)
 if (have_linux_if_addr_h)
+	message(STATUS "HAVE_LINUX_IF_ADDR_H")
+	option(HAVE_LINUX_IF_ADDR_H "HAVE_LINUX_IF_ADDR_H" 1)
 	add_definitions(-DHAVE_LINUX_IF_ADDR_H)
 endif ()
 
 check_include_files("sys/socket.h;linux/rtnetlink.h" have_linux_rtnetlink_h)
 if (have_linux_rtnetlink_h)
+	message(STATUS "HAVE_LINUX_RTNETLINK_H")
+	option(HAVE_LINUX_RTNETLINK_H "HAVE_LINUX_RTNETLINK_H" 1)
 	add_definitions(-DHAVE_LINUX_RTNETLINK_H)
 endif ()
 
 check_include_files("sys/types.h;netinet/in.h;netinet/ip.h;netinet/ip_icmp.h" have_netinet_ip_icmp_h)
 if (have_netinet_ip_icmp_h)
+	message(STATUS "HAVE_NETINET_IP_ICMP_H")
+	option(HAVE_NETINET_IP_ICMP_H "HAVE_NETINET_IP_ICMP_H" 1)
 	add_definitions(-DHAVE_NETINET_IP_ICMP_H)
 endif ()
 
 check_include_files("stdatomic.h" have_stdatomic_h)
 if (have_stdatomic_h)
+	message(STATUS "HAVE_STDATOMIC_H")
+	option(HAVE_STDATOMIC_H "HAVE_STDATOMIC_H" 1)
 	add_definitions(-DHAVE_STDATOMIC_H)
 endif ()
 
@@ -128,6 +141,7 @@ endif ()
 check_struct_has_member("struct sockaddr" "sa_len" "sys/types.h;sys/socket.h" have_sa_len)
 if (have_sa_len)
 	message(STATUS "have_sa_len")
+	option(HAVE_SA_LEN "HAVE_SA_LEN" 1)
 	add_definitions(-DHAVE_SA_LEN)
 endif ()
 
@@ -135,18 +149,21 @@ endif ()
 check_struct_has_member("struct sockaddr_in" "sin_len" "sys/types.h;netinet/in.h" have_sin_len)
 if (have_sin_len)
 	message(STATUS "have_sin_len")
+	option(HAVE_SIN_LEN "DHAVE_SIN_LEN" 1)
 	add_definitions(-DHAVE_SIN_LEN)
 endif ()
 
 check_struct_has_member("struct sockaddr_in6" "sin6_len" "sys/types.h;netinet/in.h" have_sin6_len)
 if (have_sin6_len)
 	message(STATUS "have_sin6_len")
+	option(HAVE_SIN6_LEN "HAVE_SIN6_LEN" 1)
 	add_definitions(-DHAVE_SIN6_LEN)
 endif ()
 
 check_struct_has_member("struct sockaddr_conn" "sconn_len" "zmdnet.h" have_sconn_len)
 if (have_sconn_len)
 	message(STATUS "HAVE_SCONN_LEN")
+	option(HAVE_SCONN_LEN "HAVE_SCONN_LEN" 1)
 	add_definitions(-DHAVE_SCONN_LEN)
 endif ()
 
@@ -237,17 +254,15 @@ if ("x${CMAKE_C_COMPILER_ID}" STREQUAL "xMSVC")
 	endif ()
 endif ()
 
+CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/config.h.in ./src/config.h)
 
 #################################################
 # INCLUDE SUBDIRS
 #################################################
-
 add_subdirectory(src)
-
 if (zmdnet_build_programs)
 add_subdirectory(sample)
 endif()
-
 if (zmdnet_build_tests)
 add_subdirectory(test)
 endif()

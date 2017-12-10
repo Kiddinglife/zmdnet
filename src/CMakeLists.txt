@@ -54,6 +54,7 @@ add_definitions(-DZMDNET_PROCESS_LEVEL_LOCKS)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	add_definitions(-D_GNU_SOURCE)
+	option(_GNU_SOURCE "_GNU_SOURCE" 1)
 endif ()
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")

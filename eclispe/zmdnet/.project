@@ -42,6 +42,11 @@
 			<locationURI>PARENT-2-PROJECT_LOC/SConstruct</locationURI>
 		</link>
 		<link>
+			<name>config.h.in</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/config.h.in</locationURI>
+		</link>
+		<link>
 			<name>sample</name>
 			<type>2</type>
 			<locationURI>PARENT-2-PROJECT_LOC/sample</locationURI>

@@ -36,22 +36,22 @@
 #endif
 #endif
 
-#if defined (__WIN32__)
-#include "zmdnet-os-userspace.h"
+#if defined (_WIN32)
+#include "zmdnet-os-user-space.h"
 #else
 #define min(a,b) ((a)>(b)?(b):(a))
 #define max(a,b) ((a)>(b)?(a):(b))
 #endif
 
-#if defined(__LINUX__)
+#if defined(__linux__)
 #define IPV6_VERSION            0x60
 #endif
 
-#if defined(ENABLE_RUNTIME_CHECK)
+#ifdef RUN_TIME_CHECKS
 #include <stdlib.h>
 
-static inline void
-terminate_non_graceful(void) {
+static inline void terminate_non_graceful(void)
+{
   abort();
 }
 
@@ -96,13 +96,13 @@ extern int read_random(void *buf, int count);
 
 /* errno's may differ per OS.  errno.h now included in sctp_os_userspace.h */
 /* Source: /usr/src/sys/sys/errno.h */
-/* #define  ENOSPC    28 */   /* No space left on device */
-/* #define  ENOBUFS   55 */   /* No buffer space available */
-/* #define  ENOMEM    12 */   /* Cannot allocate memory */
-/* #define  EACCES    13 */   /* Permission denied */
-/* #define  EFAULT    14 */   /* Bad address */
-/* #define  EHOSTDOWN 64 */   /* Host is down */
-/* #define  EHOSTUNREACH  65 */   /* No route to host */
+/* #define  ENOSPC    28 *//* No space left on device */
+/* #define  ENOBUFS   55 *//* No buffer space available */
+/* #define  ENOMEM    12 *//* Cannot allocate memory */
+/* #define  EACCES    13 *//* Permission denied */
+/* #define  EFAULT    14 *//* Bad address */
+/* #define  EHOSTDOWN 64 *//* Host is down */
+/* #define  EHOSTUNREACH  65 *//* No route to host */
 
 /* Source ip_output.c. extern'd in ip_var.h */
 extern u_short ip_id;
