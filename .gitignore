@@ -80,6 +80,9 @@ src/config.h
 *.out
 *.app
 
+.vs
+msvc/.vs
+
 # Compiled Object files
 *.slo
 *.lo
