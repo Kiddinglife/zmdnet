@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>staticlib</name>
+	<name>zmdnet</name>
 	<comment></comment>
 	<projects>
 	</projects>
 	<buildSpec>
+		<buildCommand>
+			<name>org.python.pydev.PyDevBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
 		<buildCommand>
 			<name>org.eclipse.cdt.managedbuilder.core.genmakebuilder</name>
 			<triggers>clean,full,incremental,</triggers>
@@ -20,15 +25,36 @@
 	</buildSpec>
 	<natures>
 		<nature>org.eclipse.cdt.core.cnature</nature>
-		<nature>org.eclipse.cdt.core.ccnature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
+		<nature>org.eclipse.cdt.core.ccnature</nature>
+		<nature>org.python.pydev.pythonNature</nature>
 	</natures>
 	<linkedResources>
 		<link>
+			<name>CMakeLists.txt</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/CMakeLists.txt</locationURI>
+		</link>
+		<link>
+			<name>SConstruct</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/SConstruct</locationURI>
+		</link>
+		<link>
+			<name>sample</name>
+			<type>2</type>
+			<locationURI>PARENT-2-PROJECT_LOC/sample</locationURI>
+		</link>
+		<link>
 			<name>src</name>
 			<type>2</type>
-			<location>/home/jackiez/eclipse-workspace/zmdnet/src</location>
+			<locationURI>PARENT-2-PROJECT_LOC/src</locationURI>
+		</link>
+		<link>
+			<name>test</name>
+			<type>2</type>
+			<locationURI>PARENT-2-PROJECT_LOC/test</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
