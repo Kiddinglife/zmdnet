@@ -254,7 +254,7 @@ if ("x${CMAKE_C_COMPILER_ID}" STREQUAL "xMSVC")
 	endif ()
 endif ()
 
-CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/config.h.in ./src/config.h)
+CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/config.h.in ${CMAKE_REQUIRED_INCLUDES}/config.h)
 
 #################################################
 # INCLUDE SUBDIRS

@@ -138,6 +138,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 list(APPEND zmdnet_headers
 	zmdnet.h
 	system/zmdnet-env.h
+    system/zmdnet-os-user-space.h
+     system/zmdnet-queue.h
 	distribution/auth/zmdnet-auth.h
 	adaption/zmdnet-socket.h
 )
@@ -169,7 +171,7 @@ list(APPEND zmdnet_headers
 # )
 list(APPEND zmdnet_sources
 	system/zmdnet-env.c
-	distribution/auth/zmdnet-auth.h
+	distribution/auth/zmdnet-auth.c
 	adaption/zmdnet-socket.c
 )
 
