@@ -7,6 +7,8 @@ env['ENV'] = os.environ
 
 # scons  -Q zmdnet_debug=0 zmdnet_run_time_checks=0 zmdnet_support_ipv6=0 zmdnet_support_ipv4=0
 
+
+
 #################################################
 # CHECK CMD-LINE COMPILIE OPTIONS
 #################################################
@@ -38,6 +40,8 @@ if int(ARGUMENTS.get('zmdnet_support_ipv6', True)):
     env.Append(CPPDEFINES=['zmdnet_support_ipv6'])
 else:
     print('not support_ipv6 ...')
+  
+  
    
 #################################################
 # CHECK FOR TYPES AND FUNCTIONS
@@ -53,8 +57,22 @@ if conf.CheckCHeader(['sys/socket.h', 'linux/if_addr.h']):
     print 'have_linux_if_addr_header'
     env.Append(CPPDEFINES=['have_linux_if_addr_header'])
 
+if conf.CheckCHeader(['sys/socket.h', 'linux/rtnetlink.h']):
+    print 'have_netinet_ip_icmp_header'
+    env.Append(CPPDEFINES=['have_netinet_ip_icmp_header'])
 
-    
+if conf.CheckCHeader('stdatomic.h'):
+    print 'have_stdatomic_header'
+    env.Append(CPPDEFINES=['have_stdatomic_header'])
+
+
+
+
+#################################################
+# CHECK STRUCT MEMBERS
+#################################################
+  
+  
 env = conf.Finish()
 
 # o = env.Object(Glob('./src/adaption/*.c'))
