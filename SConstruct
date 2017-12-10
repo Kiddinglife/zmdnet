@@ -1,77 +1,80 @@
 import os
 
-Help("\nType: 'scons program' to build the production program.\n")
-
 env = Environment()
-
 # will guarantee that SCons will be able to execute any command 
 # that you can execute from the command line
 env['ENV'] = os.environ
 
-# libname = 'zmdnetd'
-# cppdefines = []
-# for key, value in ARGLIST:
-#     if key == 'define':
-#         cppdefines.append(value)
-#     elif key == 'debug':
-#         if not int(value):
-#             env.Append(CCFLAGS = '-O2')
-#             libname = 'zmdnetr'  
-        
-vars = Variables(None, ARGUMENTS)
-vars.Add('RELEASE', 'Set to 1 to build for release', 0)
-# vars.AddVariables(
-#     ('RELEASE', 'Set to 1 to build for release', 0),
-#     ('CONFIG', 'Configuration file', '/etc/my_config'),
-#     BoolVariable('warnings', 'compilation with -Wall and similiar', 1),
-#     EnumVariable('debug', 'debug output and symbols', 'no',
-#                allowed_values=('yes', 'no', 'full'),
-#                map={}, ignorecase=0),  # case sensitive
-#     ListVariable('shared',
-#                'libraries to build as shared libraries',
-#                'all',
-#                names=''),
-#     PackageVariable('x11',
-#                   'use X11 installed here (yes = search some places)',
-#                   'yes'),
-#     PathVariable('qtdir', 'where the root of Qt is installed'),
-#)
+# scons  -Q zmdnet_debug=0 zmdnet_run_time_checks=0 zmdnet_support_ipv6=0 zmdnet_support_ipv4=0
 
-VariantDir('build', 'src', duplicate=0)
-env = Environment(variables=vars,
-                  CPPDEFINES={'RELEASE_BUILD' : '${RELEASE}'})
-Help(vars.GenerateHelpText(env))
 
-unknown = vars.UnknownVariables()
-if unknown:
-    print("Unknown variables: %s" % unknown.keys())
-    Exit(1)
 
-v = int(ARGUMENTS.get('RELEASE_BUILD', 0))
-if int(v):
+#################################################
+# CHECK CMD-LINE COMPILIE OPTIONS
+#################################################
+print('\nCHECK FOR COMPILIE OPTIONS')
+if int(ARGUMENTS.get('zmdnet_debug', True)):
+    print('debug build...')
+    env.Append(CCFLAGS='-g')
+    env.Append(CPPDEFINES=['zmdnet_debug'])
+    libname = 'zmdnetd'
+else:
+    print('release build...')
     env.Append(CCFLAGS='-O2')
     libname = 'zmdnetr'
-else:
-    env.Append(CCFLAGS='-g')
-    libname = 'zmdnetd'
     
-srcfiles = Split("""
-                ./src/sys/zmd-net-socket.c
-                """)
-o = env.Object(srcfiles)
-staticlib = env.StaticLibrary(libname, o)
+if int(ARGUMENTS.get('zmdnet_run_time_checks', True)):
+    print('do run time checks ...')
+    env.Append(CPPDEFINES=['zmdnet_run_time_checks'])
+else:
+    print('not do run time checks ...')
+    
+if int(ARGUMENTS.get('zmdnet_support_ipv4', True)):
+    print('support_ipv4 ...')
+    env.Append(CPPDEFINES=['zmdnet_support_ipv4'])
+else:
+    print('not support_ipv4 ...')
+    
+if int(ARGUMENTS.get('zmdnet_support_ipv6', True)):
+    print('support_ipv6 ...')
+    env.Append(CPPDEFINES=['zmdnet_support_ipv6'])
+else:
+    print('not support_ipv6 ...')
+  
+  
+   
+#################################################
+# CHECK FOR TYPES AND FUNCTIONS
+#################################################
+print('\nCHECK FOR TYPES AND FUNCTIONS')
+conf = Configure(env)
+if conf.CheckCHeader('sys/queue.h'):
+    env.Append(CPPDEFINES=['have_sys_queue_header'])
+    print 'have_sys_queue_header_file'
+#     Exit(1)
 
-# usually install to /usr/local/bin or /usr/local/lib
-env.Install('build/obj', o)
-env.Install('build/lib', staticlib)
+if conf.CheckCHeader(['sys/socket.h', 'linux/if_addr.h']):
+    print 'have_linux_if_addr_header'
+    env.Append(CPPDEFINES=['have_linux_if_addr_header'])
 
-# Clean(env,'',)
-# opt = env.Clone(CCFLAGS = '-O2')
-# dbg = env.Clone(CCFLAGS = '-g')
-# 
-# o = opt.Object('zmd-net-socket-r', srcfiles)
-# opt.StaticLibrary('zmdnetr', o)
-# 
-# o = dbg.Object('zmd-net-socket-d', srcfiles)
-# dbg.StaticLibrary('zmdnetd', o)
+if conf.CheckCHeader(['sys/socket.h', 'linux/rtnetlink.h']):
+    print 'have_netinet_ip_icmp_header'
+    env.Append(CPPDEFINES=['have_netinet_ip_icmp_header'])
+
+if conf.CheckCHeader('stdatomic.h'):
+    print 'have_stdatomic_header'
+    env.Append(CPPDEFINES=['have_stdatomic_header'])
+
+
+
+
+#################################################
+# CHECK STRUCT MEMBERS
+#################################################
+  
+  
+env = conf.Finish()
+
+# o = env.Object(Glob('./src/adaption/*.c'))
+staticlib = env.StaticLibrary(libname, Glob('./src/*/*.c'))
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>zmdnet-static-lib</name>
+	<name>zmdnet</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -11,45 +11,50 @@
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>org.eclipse.cdt.managedbuilder.core.ScannerConfigBuilder</name>
-			<triggers>full,incremental,</triggers>
+			<name>org.eclipse.cdt.managedbuilder.core.genmakebuilder</name>
+			<triggers>clean,full,incremental,</triggers>
 			<arguments>
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>ch.hsr.ifs.sconsolidator.Builder</name>
+			<name>org.eclipse.cdt.managedbuilder.core.ScannerConfigBuilder</name>
+			<triggers>full,incremental,</triggers>
 			<arguments>
 			</arguments>
 		</buildCommand>
 	</buildSpec>
 	<natures>
 		<nature>org.eclipse.cdt.core.cnature</nature>
-		<nature>org.eclipse.cdt.core.ccnature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
-		<nature>ch.hsr.ifs.sconsolidator.ExistingCodeNature</nature>
+		<nature>org.eclipse.cdt.core.ccnature</nature>
 		<nature>org.python.pydev.pythonNature</nature>
 	</natures>
 	<linkedResources>
 		<link>
-			<name>docx</name>
-			<type>2</type>
-			<location>/home/jackiez/eclipse-oxygen-workspace/zmdnet/docx</location>
+			<name>CMakeLists.txt</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/CMakeLists.txt</locationURI>
+		</link>
+		<link>
+			<name>SConstruct</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/SConstruct</locationURI>
 		</link>
 		<link>
 			<name>sample</name>
 			<type>2</type>
-			<location>/home/jackiez/eclipse-oxygen-workspace/zmdnet/sample</location>
+			<locationURI>PARENT-2-PROJECT_LOC/sample</locationURI>
 		</link>
 		<link>
 			<name>src</name>
 			<type>2</type>
-			<location>/home/jackiez/eclipse-workspace/zmdnet/src</location>
+			<locationURI>PARENT-2-PROJECT_LOC/src</locationURI>
 		</link>
 		<link>
 			<name>test</name>
 			<type>2</type>
-			<location>/home/jackiez/eclipse-oxygen-workspace/zmdnet/test</location>
+			<locationURI>PARENT-2-PROJECT_LOC/test</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

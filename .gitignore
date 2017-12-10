@@ -36,6 +36,11 @@
 /_builds
 /build
 /_build
+/CMakeFiles
+CMakeCache.txt
+CMakeList.txt
+Makefile
+cmake_install.cmake
 
 # Prerequisites
 *.d

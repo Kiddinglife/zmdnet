@@ -1130,154 +1130,152 @@ struct zmdnet_timeval
   uint32_t tv_usec;
 };
 
-struct zmdnetstat
-{
-  struct zmdnet_timeval zmdnets_discontinuitytime; /* zmdnetStats 18 (TimeStamp) */
-  /* MIB according to RFC 3873 */
-  uint32_t zmdnets_currestab; /* zmdnetStats  1   (Gauge32) */
-  uint32_t zmdnets_activeestab; /* zmdnetStats  2 (Counter32) */
-  uint32_t zmdnets_restartestab;
-  uint32_t zmdnets_collisionestab;
-  uint32_t zmdnets_passiveestab; /* zmdnetStats  3 (Counter32) */
-  uint32_t zmdnets_aborted; /* zmdnetStats  4 (Counter32) */
-  uint32_t zmdnets_shutdown; /* zmdnetStats  5 (Counter32) */
-  uint32_t zmdnets_outoftheblue; /* zmdnetStats  6 (Counter32) */
-  uint32_t zmdnets_checksumerrors; /* zmdnetStats  7 (Counter32) */
-  uint32_t zmdnets_outcontrolchunks; /* zmdnetStats  8 (Counter64) */
-  uint32_t zmdnets_outorderchunks; /* zmdnetStats  9 (Counter64) */
-  uint32_t zmdnets_outunorderchunks; /* zmdnetStats 10 (Counter64) */
-  uint32_t zmdnets_incontrolchunks; /* zmdnetStats 11 (Counter64) */
-  uint32_t zmdnets_inorderchunks; /* zmdnetStats 12 (Counter64) */
-  uint32_t zmdnets_inunorderchunks; /* zmdnetStats 13 (Counter64) */
-  uint32_t zmdnets_fragmsgs; /* zmdnetStats 14 (Counter64) */
-  uint32_t zmdnets_reasmmsgs; /* zmdnetStats 15 (Counter64) */
-  uint32_t zmdnets_outpackets; /* zmdnetStats 16 (Counter64) */
-  uint32_t zmdnets_inpackets; /* zmdnetStats 17 (Counter64) */
+struct zmdnetstat {
+	struct zmdnet_timeval zmdnets_discontinuitytime; /* zmdnetStats 18 (TimeStamp) */
+	/* MIB according to RFC 3873 */
+	uint32_t  zmdnets_currestab;           /* zmdnetStats  1   (Gauge32) */
+	uint32_t  zmdnets_activeestab;         /* zmdnetStats  2 (Counter32) */
+	uint32_t  zmdnets_restartestab;
+	uint32_t  zmdnets_collisionestab;
+	uint32_t  zmdnets_passiveestab;        /* zmdnetStats  3 (Counter32) */
+	uint32_t  zmdnets_aborted;             /* zmdnetStats  4 (Counter32) */
+	uint32_t  zmdnets_shutdown;            /* zmdnetStats  5 (Counter32) */
+	uint32_t  zmdnets_outoftheblue;        /* zmdnetStats  6 (Counter32) */
+	uint32_t  zmdnets_checksumerrors;      /* zmdnetStats  7 (Counter32) */
+	uint32_t  zmdnets_outcontrolchunks;    /* zmdnetStats  8 (Counter64) */
+	uint32_t  zmdnets_outorderchunks;      /* zmdnetStats  9 (Counter64) */
+	uint32_t  zmdnets_outunorderchunks;    /* zmdnetStats 10 (Counter64) */
+	uint32_t  zmdnets_incontrolchunks;     /* zmdnetStats 11 (Counter64) */
+	uint32_t  zmdnets_inorderchunks;       /* zmdnetStats 12 (Counter64) */
+	uint32_t  zmdnets_inunorderchunks;     /* zmdnetStats 13 (Counter64) */
+	uint32_t  zmdnets_fragusrmsgs;         /* zmdnetStats 14 (Counter64) */
+	uint32_t  zmdnets_reasmusrmsgs;        /* zmdnetStats 15 (Counter64) */
+	uint32_t  zmdnets_outpackets;          /* zmdnetStats 16 (Counter64) */
+	uint32_t  zmdnets_inpackets;           /* zmdnetStats 17 (Counter64) */
 
-  /* input statistics: */
-  uint32_t zmdnets_recvpackets; /* total input packets        */
-  uint32_t zmdnets_recvdatagrams; /* total input datagrams      */
-  uint32_t zmdnets_recvpktwithdata; /* total packets that had data */
-  uint32_t zmdnets_recvsacks; /* total input SACK chunks    */
-  uint32_t zmdnets_recvdata; /* total input DATA chunks    */
-  uint32_t zmdnets_recvdupdata; /* total input duplicate DATA chunks */
-  uint32_t zmdnets_recvheartbeat; /* total input HB chunks      */
-  uint32_t zmdnets_recvheartbeatack; /* total input HB-ACK chunks  */
-  uint32_t zmdnets_recvecne; /* total input ECNE chunks    */
-  uint32_t zmdnets_recvauth; /* total input AUTH chunks    */
-  uint32_t zmdnets_recvauthmissing; /* total input chunks missing AUTH */
-  uint32_t zmdnets_recvivalhmacid; /* total number of invalid HMAC ids received */
-  uint32_t zmdnets_recvivalkeyid; /* total number of invalid secret ids received */
-  uint32_t zmdnets_recvauthfailed; /* total number of auth failed */
-  uint32_t zmdnets_recvexpress; /* total fast path receives all one chunk */
-  uint32_t zmdnets_recvexpressm; /* total fast path multi-part data */
-  uint32_t zmdnets_recvnocrc;
-  uint32_t zmdnets_recvswcrc;
-  uint32_t zmdnets_recvhwcrc;
+	/* input statistics: */
+	uint32_t  zmdnets_recvpackets;         /* total input packets        */
+	uint32_t  zmdnets_recvdatagrams;       /* total input datagrams      */
+	uint32_t  zmdnets_recvpktwithdata;     /* total packets that had data */
+	uint32_t  zmdnets_recvsacks;           /* total input SACK chunks    */
+	uint32_t  zmdnets_recvdata;            /* total input DATA chunks    */
+	uint32_t  zmdnets_recvdupdata;         /* total input duplicate DATA chunks */
+	uint32_t  zmdnets_recvheartbeat;       /* total input HB chunks      */
+	uint32_t  zmdnets_recvheartbeatack;    /* total input HB-ACK chunks  */
+	uint32_t  zmdnets_recvecne;            /* total input ECNE chunks    */
+	uint32_t  zmdnets_recvauth;            /* total input AUTH chunks    */
+	uint32_t  zmdnets_recvauthmissing;     /* total input chunks missing AUTH */
+	uint32_t  zmdnets_recvivalhmacid;      /* total number of invalid HMAC ids received */
+	uint32_t  zmdnets_recvivalkeyid;       /* total number of invalid secret ids received */
+	uint32_t  zmdnets_recvauthfailed;      /* total number of auth failed */
+	uint32_t  zmdnets_recvexpress;         /* total fast path receives all one chunk */
+	uint32_t  zmdnets_recvexpressm;        /* total fast path multi-part data */
+	uint32_t  zmdnets_recvnocrc;
+	uint32_t  zmdnets_recvswcrc;
+	uint32_t  zmdnets_recvhwcrc;
 
-  /* output statistics: */
-  uint32_t zmdnets_sendpackets; /* total output packets       */
-  uint32_t zmdnets_sendsacks; /* total output SACKs         */
-  uint32_t zmdnets_senddata; /* total output DATA chunks   */
-  uint32_t zmdnets_sendretransdata; /* total output retransmitted DATA chunks */
-  uint32_t zmdnets_sendfastretrans; /* total output fast retransmitted DATA chunks */
-  uint32_t zmdnets_sendmultfastretrans; /* total FR's that happened more than once
-   * to same chunk (u-del multi-fr algo).
-   */
-  uint32_t zmdnets_sendheartbeat; /* total output HB chunks     */
-  uint32_t zmdnets_sendecne; /* total output ECNE chunks    */
-  uint32_t zmdnets_sendauth; /* total output AUTH chunks FIXME   */
-  uint32_t zmdnets_senderrors; /* ip_output error counter */
-  uint32_t zmdnets_sendnocrc;
-  uint32_t zmdnets_sendswcrc;
-  uint32_t zmdnets_sendhwcrc;
-  /* PCKDROPREP statistics: */
-  uint32_t zmdnets_pdrpfmbox; /* Packet drop from middle box */
-  uint32_t zmdnets_pdrpfehos; /* P-drop from end host */
-  uint32_t zmdnets_pdrpmbda; /* P-drops with data */
-  uint32_t zmdnets_pdrpmbct; /* P-drops, non-data, non-endhost */
-  uint32_t zmdnets_pdrpbwrpt; /* P-drop, non-endhost, bandwidth rep only */
-  uint32_t zmdnets_pdrpcrupt; /* P-drop, not enough for chunk header */
-  uint32_t zmdnets_pdrpnedat; /* P-drop, not enough data to confirm */
-  uint32_t zmdnets_pdrppdbrk; /* P-drop, where process_chunk_drop said break */
-  uint32_t zmdnets_pdrptsnnf; /* P-drop, could not find TSN */
-  uint32_t zmdnets_pdrpdnfnd; /* P-drop, attempt reverse TSN lookup */
-  uint32_t zmdnets_pdrpdiwnp; /* P-drop, e-host confirms zero-rwnd */
-  uint32_t zmdnets_pdrpdizrw; /* P-drop, midbox confirms no space */
-  uint32_t zmdnets_pdrpbadd; /* P-drop, data did not match TSN */
-  uint32_t zmdnets_pdrpmark; /* P-drop, TSN's marked for Fast Retran */
-  /* timeouts */
-  uint32_t zmdnets_timoiterator; /* Number of iterator timers that fired */
-  uint32_t zmdnets_timodata; /* Number of T3 data time outs */
-  uint32_t zmdnets_timowindowprobe; /* Number of window probe (T3) timers that fired */
-  uint32_t zmdnets_timoinit; /* Number of INIT timers that fired */
-  uint32_t zmdnets_timosack; /* Number of sack timers that fired */
-  uint32_t zmdnets_timoshutdown; /* Number of shutdown timers that fired */
-  uint32_t zmdnets_timoheartbeat; /* Number of heartbeat timers that fired */
-  uint32_t zmdnets_timocookie; /* Number of times a cookie timeout fired */
-  uint32_t zmdnets_timosecret; /* Number of times an endpoint changed its cookie secret*/
-  uint32_t zmdnets_timopathmtu; /* Number of PMTU timers that fired */
-  uint32_t zmdnets_timoshutdownack; /* Number of shutdown ack timers that fired */
-  uint32_t zmdnets_timoshutdownguard; /* Number of shutdown guard timers that fired */
-  uint32_t zmdnets_timostrmrst; /* Number of stream reset timers that fired */
-  uint32_t zmdnets_timoearlyfr; /* Number of early FR timers that fired */
-  uint32_t zmdnets_timoasconf; /* Number of times an asconf timer fired */
-  uint32_t zmdnets_timodelprim; /* Number of times a prim_deleted timer fired */
-  uint32_t zmdnets_timoautoclose; /* Number of times auto close timer fired */
-  uint32_t zmdnets_timoassockill; /* Number of asoc free timers expired */
-  uint32_t zmdnets_timoinpkill; /* Number of inp free timers expired */
-  /* former early FR counters */
-  uint32_t zmdnets_spare[11];
-  /* others */
-  uint32_t zmdnets_hdrops; /* packet shorter than header */
-  uint32_t zmdnets_badsum; /* checksum error             */
-  uint32_t zmdnets_noport; /* no endpoint for port       */
-  uint32_t zmdnets_badvtag; /* bad v-tag                  */
-  uint32_t zmdnets_badsid; /* bad SID                    */
-  uint32_t zmdnets_nomem; /* no memory                  */
-  uint32_t zmdnets_fastretransinrtt; /* number of multiple FR in a RTT window */
-  uint32_t zmdnets_markedretrans;
-  uint32_t zmdnets_naglesent; /* nagle allowed sending      */
-  uint32_t zmdnets_naglequeued; /* nagle doesn't allow sending */
-  uint32_t zmdnets_maxburstqueued; /* max burst doesn't allow sending */
-  uint32_t zmdnets_ifnomemqueued; /* look ahead tells us no memory in
-   * interface ring buffer OR we had a
-   * send error and are queuing one send.
-   */
-  uint32_t zmdnets_windowprobed; /* total number of window probes sent */
-  uint32_t zmdnets_lowlevelerr; /* total times an output error causes us
-   * to clamp down on next user send.
-   */
-  uint32_t zmdnets_lowlevelerr; /* total times zmdnet_senderrors were caused from
-   * a user send from a user invoked send not
-   * a sack response
-   */
-  uint32_t zmdnets_datadropchklmt; /* Number of in data drops due to chunk limit reached */
-  uint32_t zmdnets_datadroprwnd; /* Number of in data drops due to rwnd limit reached */
-  uint32_t zmdnets_ecnereducedcwnd; /* Number of times a ECN reduced the cwnd */
-  uint32_t zmdnets_vtagexpress; /* Used express lookup via vtag */
-  uint32_t zmdnets_vtagbogus; /* Collision in express lookup. */
-  uint32_t zmdnets_primary_randry; /* Number of times the sender ran dry of user data on primary */
-  uint32_t zmdnets_cmt_randry; /* Same for above */
-  uint32_t zmdnets_slowpath_sack; /* Sacks the slow way */
-  uint32_t zmdnets_wu_sacks_sent; /* Window Update only sacks sent */
-  uint32_t zmdnets_sends_with_flags; /* number of sends with sinfo_flags !=0 */
-  uint32_t zmdnets_sends_with_unord; /* number of unordered sends */
-  uint32_t zmdnets_sends_with_eof; /* number of sends with EOF flag set */
-  uint32_t zmdnets_sends_with_abort; /* number of sends with ABORT flag set */
-  uint32_t zmdnets_protocol_drain_calls;/* number of times protocol drain called */
-  uint32_t zmdnets_protocol_drains_done;/* number of times we did a protocol drain */
-  uint32_t zmdnets_read_peeks; /* Number of times recv was called with peek */
-  uint32_t zmdnets_cached_chk; /* Number of cached chunks used */
-  uint32_t zmdnets_cached_strmoq; /* Number of cached stream oq's used */
-  uint32_t zmdnets_left_abandon; /* Number of unread messages abandoned by close */
-  uint32_t zmdnets_send_burst_avoid; /* Unused */
-  uint32_t zmdnets_send_cwnd_avoid; /* Send cwnd full  avoidance, already max burst inflight to net */
-  uint32_t zmdnets_fwdtsn_map_over; /* number of map array over-runs via fwd-tsn's */
-  uint32_t zmdnets_queue_upd_ecne; /* Number of times we queued or updated an ECN chunk on send queue */
-  uint32_t zmdnets_reserved[31]; /* Future ABI compat - remove int's from here when adding new */
+	/* output statistics: */
+	uint32_t  zmdnets_sendpackets;         /* total output packets       */
+	uint32_t  zmdnets_sendsacks;           /* total output SACKs         */
+	uint32_t  zmdnets_senddata;            /* total output DATA chunks   */
+	uint32_t  zmdnets_sendretransdata;     /* total output retransmitted DATA chunks */
+	uint32_t  zmdnets_sendfastretrans;     /* total output fast retransmitted DATA chunks */
+	uint32_t  zmdnets_sendmultfastretrans; /* total FR's that happened more than once
+	                                      * to same chunk (u-del multi-fr algo).
+	                                      */
+	uint32_t  zmdnets_sendheartbeat;       /* total output HB chunks     */
+	uint32_t  zmdnets_sendecne;            /* total output ECNE chunks    */
+	uint32_t  zmdnets_sendauth;            /* total output AUTH chunks FIXME   */
+	uint32_t  zmdnets_senderrors;          /* ip_output error counter */
+	uint32_t  zmdnets_sendnocrc;
+	uint32_t  zmdnets_sendswcrc;
+	uint32_t  zmdnets_sendhwcrc;
+	/* PCKDROPREP statistics: */
+	uint32_t  zmdnets_pdrpfmbox;           /* Packet drop from middle box */
+	uint32_t  zmdnets_pdrpfehos;           /* P-drop from end host */
+	uint32_t  zmdnets_pdrpmbda;            /* P-drops with data */
+	uint32_t  zmdnets_pdrpmbct;            /* P-drops, non-data, non-endhost */
+	uint32_t  zmdnets_pdrpbwrpt;           /* P-drop, non-endhost, bandwidth rep only */
+	uint32_t  zmdnets_pdrpcrupt;           /* P-drop, not enough for chunk header */
+	uint32_t  zmdnets_pdrpnedat;           /* P-drop, not enough data to confirm */
+	uint32_t  zmdnets_pdrppdbrk;           /* P-drop, where process_chunk_drop said break */
+	uint32_t  zmdnets_pdrptsnnf;           /* P-drop, could not find TSN */
+	uint32_t  zmdnets_pdrpdnfnd;           /* P-drop, attempt reverse TSN lookup */
+	uint32_t  zmdnets_pdrpdiwnp;           /* P-drop, e-host confirms zero-rwnd */
+	uint32_t  zmdnets_pdrpdizrw;           /* P-drop, midbox confirms no space */
+	uint32_t  zmdnets_pdrpbadd;            /* P-drop, data did not match TSN */
+	uint32_t  zmdnets_pdrpmark;            /* P-drop, TSN's marked for Fast Retran */
+	/* timeouts */
+	uint32_t  zmdnets_timoiterator;        /* Number of iterator timers that fired */
+	uint32_t  zmdnets_timodata;            /* Number of T3 data time outs */
+	uint32_t  zmdnets_timowindowprobe;     /* Number of window probe (T3) timers that fired */
+	uint32_t  zmdnets_timoinit;            /* Number of INIT timers that fired */
+	uint32_t  zmdnets_timosack;            /* Number of sack timers that fired */
+	uint32_t  zmdnets_timoshutdown;        /* Number of shutdown timers that fired */
+	uint32_t  zmdnets_timoheartbeat;       /* Number of heartbeat timers that fired */
+	uint32_t  zmdnets_timocookie;          /* Number of times a cookie timeout fired */
+	uint32_t  zmdnets_timosecret;          /* Number of times an endpoint changed its cookie secret*/
+	uint32_t  zmdnets_timopathmtu;         /* Number of PMTU timers that fired */
+	uint32_t  zmdnets_timoshutdownack;     /* Number of shutdown ack timers that fired */
+	uint32_t  zmdnets_timoshutdownguard;   /* Number of shutdown guard timers that fired */
+	uint32_t  zmdnets_timostrmrst;         /* Number of stream reset timers that fired */
+	uint32_t  zmdnets_timoearlyfr;         /* Number of early FR timers that fired */
+	uint32_t  zmdnets_timoasconf;          /* Number of times an asconf timer fired */
+	uint32_t  zmdnets_timodelprim;	     /* Number of times a prim_deleted timer fired */
+	uint32_t  zmdnets_timoautoclose;       /* Number of times auto close timer fired */
+	uint32_t  zmdnets_timoassockill;       /* Number of asoc free timers expired */
+	uint32_t  zmdnets_timoinpkill;         /* Number of inp free timers expired */
+	/* former early FR counters */
+	uint32_t  zmdnets_spare[11];
+	/* others */
+	uint32_t  zmdnets_hdrops;              /* packet shorter than header */
+	uint32_t  zmdnets_badsum;              /* checksum error             */
+	uint32_t  zmdnets_noport;              /* no endpoint for port       */
+	uint32_t  zmdnets_badvtag;             /* bad v-tag                  */
+	uint32_t  zmdnets_badsid;              /* bad SID                    */
+	uint32_t  zmdnets_nomem;               /* no memory                  */
+	uint32_t  zmdnets_fastretransinrtt;    /* number of multiple FR in a RTT window */
+	uint32_t  zmdnets_markedretrans;
+	uint32_t  zmdnets_naglesent;           /* nagle allowed sending      */
+	uint32_t  zmdnets_naglequeued;         /* nagle doesn't allow sending */
+	uint32_t  zmdnets_maxburstqueued;      /* max burst doesn't allow sending */
+	uint32_t  zmdnets_ifnomemqueued;       /* look ahead tells us no memory in
+	                                      * interface ring buffer OR we had a
+	                                      * send error and are queuing one send.
+	                                      */
+	uint32_t  zmdnets_windowprobed;        /* total number of window probes sent */
+	uint32_t  zmdnets_lowlevelerr;         /* total times an output error causes us
+	                                      * to clamp down on next user send.
+	                                      */
+	uint32_t  zmdnets_lowlevelerrusr;      /* total times zmdnet_senderrors were caused from
+	                                      * a user send from a user invoked send not
+	                                      * a sack response
+	                                      */
+	uint32_t  zmdnets_datadropchklmt;      /* Number of in data drops due to chunk limit reached */
+	uint32_t  zmdnets_datadroprwnd;        /* Number of in data drops due to rwnd limit reached */
+	uint32_t  zmdnets_ecnereducedcwnd;     /* Number of times a ECN reduced the cwnd */
+	uint32_t  zmdnets_vtagexpress;         /* Used express lookup via vtag */
+	uint32_t  zmdnets_vtagbogus;           /* Collision in express lookup. */
+	uint32_t  zmdnets_primary_randry;      /* Number of times the sender ran dry of user data on primary */
+	uint32_t  zmdnets_cmt_randry;          /* Same for above */
+	uint32_t  zmdnets_slowpath_sack;       /* Sacks the slow way */
+	uint32_t  zmdnets_wu_sacks_sent;       /* Window Update only sacks sent */
+	uint32_t  zmdnets_sends_with_flags;    /* number of sends with sinfo_flags !=0 */
+	uint32_t  zmdnets_sends_with_unord;    /* number of unordered sends */
+	uint32_t  zmdnets_sends_with_eof;      /* number of sends with EOF flag set */
+	uint32_t  zmdnets_sends_with_abort;    /* number of sends with ABORT flag set */
+	uint32_t  zmdnets_protocol_drain_calls;/* number of times protocol drain called */
+	uint32_t  zmdnets_protocol_drains_done;/* number of times we did a protocol drain */
+	uint32_t  zmdnets_read_peeks;          /* Number of times recv was called with peek */
+	uint32_t  zmdnets_cached_chk;          /* Number of cached chunks used */
+	uint32_t  zmdnets_cached_strmoq;       /* Number of cached stream oq's used */
+	uint32_t  zmdnets_left_abandon;        /* Number of unread messages abandoned by close */
+	uint32_t  zmdnets_send_burst_avoid;    /* Unused */
+	uint32_t  zmdnets_send_cwnd_avoid;     /* Send cwnd full  avoidance, already max burst inflight to net */
+	uint32_t  zmdnets_fwdtsn_map_over;     /* number of map array over-runs via fwd-tsn's */
+	uint32_t  zmdnets_queue_upd_ecne;      /* Number of times we queued or updated an ECN chunk on send queue */
+	uint32_t  zmdnets_reserved[31];        /* Future ABI compat - remove int's from here when adding new */
 };
-
 void
 zmdnet_get_stat (struct zmdnetstat *);
 
