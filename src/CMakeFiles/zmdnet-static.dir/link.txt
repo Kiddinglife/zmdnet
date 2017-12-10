@@ -1,2 +1,0 @@
-/usr/bin/ar qc libzmdnet.a  CMakeFiles/zmdnet-static.dir/system/zmdnet-env.c.o CMakeFiles/zmdnet-static.dir/adaption/zmdnet-socket.c.o
-/usr/bin/ranlib libzmdnet.a
