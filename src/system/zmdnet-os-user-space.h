@@ -28,7 +28,6 @@
 #ifndef SRC_SYSTEM_ZMDNET_OS_USER_SPACE_H_
 #define SRC_SYSTEM_ZMDNET_OS_USER_SPACE_H_
 
-
 //user space includes
 //All the opt_xxx.h files are placed in the kernel build directory.
 //We will place them in userspace stack build directory.
@@ -156,7 +155,7 @@ typedef HANDLE zmdnet_thread_t;
  *    The options include:
  *       - implement them generically (but maybe not truly atomic?) in userspace
  *       - have ifdef's for __Userspace_arch_ perhaps (OS isn't enough...)
- */  WSAEADDRINUSE
+ */WSAEADDRINUSE
 #endif
 #ifndef EADDRNOTAVAIL
 #define EADDRNOTAVAIL           WSAEADDRNOTAVAIL
@@ -463,6 +462,8 @@ struct selinfo
 #endif
 
 #include "zmdnet-atomic.h"
+
+
 
 //IAMHERE   sctp_os_userspace.h line 462 #include "user_socketvar.h"
 
