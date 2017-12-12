@@ -52,6 +52,10 @@
     } while (!mret)
 #endif
 
+#ifndef ZMDNET_DBG
+#define ZMDNET_DBG(...)
+#endif
+
 #ifndef ZMDNET_DEBUG_USR
 #define ZMDNET_DEBUG_USR 0x80000000
 #endif
@@ -269,10 +273,8 @@ static int mb_ctor_clust(void *mem, void *arg, int flgs)
   struct clust_args * cla;
   u_int *refcnt;
   int type, size;
-  zmdnet_zone_t zone;
 
   type = EXT_CLUSTER;
-  zone = zone_clust;
   size = MCLBYTES;
 
   cla = (struct clust_args *) arg;
@@ -330,12 +332,14 @@ void m_tag_delete_chain(struct mbuf *m, struct m_tag *t)
 
 static void zmdnet_print_mbuf_chain(struct mbuf *m)
 {
-  ZMDNET_DEBUG(ZMDNET_DEBUG_USR, "Printing mbuf chain %p.\n", (void *) m);
+  ZMDNET_DBG(ZMDNET_DEBUG_USR, "Printing mbuf chain %p.\n", (void *) m);
   for (; m; m = m->m_next)
   {
-    ZMDNET_DEBUG(ZMDNET_DEBUG_USR, "%p: m_len = %ld, m_type = %x, m_next = %p.\n", (void *) m, m->m_len, m->m_type, (void *) m->m_next);
+    ZMDNET_DBG(ZMDNET_DEBUG_USR, "%p: m_len = %ld, m_type = %x, m_next = %p.\n", (void *) m, m->m_len, m->m_type, (void *) m->m_next);
     if (m->m_flags & M_EXT)
-      ZMDNET_DEBUG(ZMDNET_DEBUG_USR, "%p: extend_size = %d, extend_buffer = %p, ref_cnt = %d.\n", (void *) m, m->m_ext.ext_size, (void *) m->m_ext.ext_buf, *(m->m_ext.ref_cnt));
+    {
+      ZMDNET_DBG(ZMDNET_DEBUG_USR, "%p: extend_size = %d, extend_buffer = %p, ref_cnt = %d.\n", (void *) m, m->m_ext.ext_size, (void *) m->m_ext.ext_buf, *(m->m_ext.ref_cnt));
+    }
   }
 }
 
@@ -483,7 +487,7 @@ m_pullup(struct mbuf *n, int len)
 }
 
 static struct mbuf *
-m_dup1(struct mbuf *m, int off, int len, int wait)
+m_dup1(struct mbuf *m, int off, int len)
 {
   struct mbuf *n = NULL;
   int copyhdr;
@@ -498,23 +502,23 @@ m_dup1(struct mbuf *m, int off, int len, int wait)
   {
     if (copyhdr == 1)
     {
-      m_clget(n, wait); /* TODO: include code for copying the header */
-      m_dup_pkthdr(n, m, wait);
+      m_clget(n); /* TODO: include code for copying the header */
+      m_dup_pkthdr(n, m);
     }
     else
-      m_clget(n, wait);
+      m_clget(n);
   }
   else
   {
     if (copyhdr == 1)
-      n = m_gethdr(wait, m->m_type);
+      n = m_gethdr(m->m_type);
     else
-      n = m_get(wait, m->m_type);
+      n = m_get(m->m_type);
   }
   if (!n)
     return NULL; /* ENOBUFS */
 
-  if (copyhdr && !m_dup_pkthdr(n, m, wait))
+  if (copyhdr && !m_dup_pkthdr(n, m))
   {
     m_free(n);
     return NULL;
@@ -754,7 +758,7 @@ m_copym(struct mbuf *m, int off0, int len, int wait)
       goto nospace;
     if (copyhdr)
     {
-      if (!m_dup_pkthdr(n, m, wait))
+      if (!m_dup_pkthdr(n, m))
         goto nospace;
       if (len == M_COPYALL)
         n->m_pkthdr.len -= off0;
@@ -785,7 +789,7 @@ m_copym(struct mbuf *m, int off0, int len, int wait)
   return (NULL);
 }
 
-int m_tag_copy_chain(struct mbuf *to, struct mbuf *from, int how)
+int m_tag_copy_chain(struct mbuf *to, struct mbuf *from)
 {
   struct m_tag *p, *t, *tprev = NULL;
 
@@ -794,7 +798,7 @@ int m_tag_copy_chain(struct mbuf *to, struct mbuf *from, int how)
   m_tag_delete_chain(to, NULL);
   SLIST_FOREACH(p, &from->m_pkthdr.tags, m_tag_link)
   {
-    t = m_tag_copy(p, how);
+    t = m_tag_copy(p);
     if (t == NULL)
     {
       m_tag_delete_chain(to, NULL);
@@ -814,7 +818,7 @@ int m_tag_copy_chain(struct mbuf *to, struct mbuf *from, int how)
  * "from" must have M_PKTHDR set, and "to" must be empty.
  * In particular, this does a deep copy of the packet tags.
  */
-int m_dup_pkthdr(struct mbuf *to, struct mbuf *from, int how)
+int m_dup_pkthdr(struct mbuf *to, struct mbuf *from)
 {
 
   ZMDNET_ASSERT(to, ("m_dup_pkthdr: to is NULL"));
@@ -824,17 +828,17 @@ int m_dup_pkthdr(struct mbuf *to, struct mbuf *from, int how)
     to->m_data = to->m_pktdat;
   to->m_pkthdr = from->m_pkthdr;
   SLIST_INIT(&to->m_pkthdr.tags);
-  return (m_tag_copy_chain(to, from, MBTOM(how)));
+  return (m_tag_copy_chain(to, from));
 }
 
 /* Copy a single tag. */
 struct m_tag *
-m_tag_copy(struct m_tag *t, int how)
+m_tag_copy(struct m_tag *t)
 {
   struct m_tag *p;
 
   ZMDNET_ASSERT(t, ("m_tag_copy: null tag"));
-  p = m_tag_alloc(t->m_tag_cookie, t->m_tag_id, t->m_tag_len, how);
+  p = m_tag_alloc(t->m_tag_cookie, t->m_tag_id, t->m_tag_len);
   if (p == NULL)
     return (NULL);
   memcpy(p + 1, t + 1, t->m_tag_len); /* Copy the data */
@@ -843,7 +847,7 @@ m_tag_copy(struct m_tag *t, int how)
 
 /* Get a packet tag structure along with specified data following. */
 struct m_tag *
-m_tag_alloc(u_int32_t cookie, int type, int len, int wait)
+m_tag_alloc(u_int32_t cookie, int type, int len)
 {
   struct m_tag *t;
 

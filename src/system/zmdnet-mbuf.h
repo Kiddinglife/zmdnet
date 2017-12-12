@@ -101,14 +101,14 @@ void m_cat(struct mbuf *m, struct mbuf *n);
 void m_adj(struct mbuf *, int);
 void mb_free_ext(struct mbuf *);
 void m_freem(struct mbuf *);
-struct m_tag *m_tag_alloc(u_int32_t, int, int, int);
+struct m_tag *m_tag_alloc(u_int32_t, int, int);
 struct mbuf *m_copym(struct mbuf *, int, int, int);
 void m_copyback(struct mbuf *, int, int, caddr_t);
 struct mbuf *m_pullup(struct mbuf *, int);
 struct mbuf *m_pulldown(struct mbuf *, int off, int len, int *offp);
-int m_dup_pkthdr(struct mbuf *, struct mbuf *, int);
-struct m_tag *m_tag_copy(struct m_tag *, int);
-int m_tag_copy_chain(struct mbuf *, struct mbuf *, int);
+int m_dup_pkthdr(struct mbuf *, struct mbuf *);
+struct m_tag *m_tag_copy(struct m_tag *);
+int m_tag_copy_chain(struct mbuf *, struct mbuf *);
 struct mbuf *m_prepend(struct mbuf *, int, int);
 void m_copydata(const struct mbuf *, int, int, caddr_t);
 

@@ -452,16 +452,43 @@ struct selinfo
 
 #include <stdio.h>
 #include <string.h>
-/* #include <sys/param.h>  in FreeBSD defines MSIZE */
-/* #include <sys/ktr.h> */
-/* #include <sys/systm.h> */
 #if defined(HAVE_SYS_QUEUE_H)
 #include <sys/queue.h>
 #else
 #include "zmdnet-queue.h"
 #endif
-
+#if defined(__FreeBSD__) && __FreeBSD_version > 602000
+#include <sys/rwlock.h>
+#endif
+#if defined(__FreeBSD__) && __FreeBSD_version > 602000
+#include <sys/priv.h>
+#endif
+#if defined(__DragonFly__)
+/* was a 0 byte file.  needed for structs if_data(64) and net_event_data */
+#include <net/if_var.h>
+#endif
+#if defined(__FreeBSD__)
+#include <net/if_types.h>
+#endif
+#if !defined(_WIN32) && !defined(__native_client__)
+#include <net/if.h>
+#include <netinet/in.h>
+#include <netinet/in_systm.h>
+#include <netinet/ip.h>
+#endif
+#if defined(HAVE_NETINET_IP_ICMP_H)
+#include <netinet/ip_icmp.h>
+#else
+#include <zmdnet-icmp.h>
+#endif
+#if !defined(_WIN32)
+#if defined(ZMDNET_SUPPORT_IPV4) || defined(ZMDNET_SUPPORT_IPV6)
+#include <ifaddrs.h>
+#endif
 #include "zmdnet-atomic.h"
+#include "zmdnet-mbuf.h"
+#include <limits.h>
+#include <sys/types.h>
 
 #define ZMDNET_MALLOC_WAIT(mret,type,size) \
     do\
