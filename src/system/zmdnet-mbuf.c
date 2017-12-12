@@ -29,12 +29,6 @@
  *
  */
 
-/*
- *  __Userspace__ version of /usr/src/sys/kern/kern_mbuf.c
- *  We are initializing two zones for Mbufs and Clusters.
- *
- */
-
 #include "../config.h"
 
 #include <stdio.h>
@@ -43,12 +37,24 @@
 #include "zmdnet-mbuf.h"
 #include "zmdnet-env.h"
 #include "zmdnet-atomic.h"
-//#include "netinet/sctp_pcb.h"
+//#include "netinet/zmdnet_pcb.h"
 
-#define SCTP_ZONE_INIT(zone, name, size, number) {zone = size;}
-#define SCTP_ZONE_GET(zone, type)  (type *)malloc(zone);
-#define SCTP_ZONE_FREE(zone, element) {free(element);}
-#define SCTP_ZONE_DESTROY(zone)
+#define ZMDNET_ZONE_INIT(zone, name, size, number) {zone = size;}
+#define ZMDNET_ZONE_GET(zone, type)  (type *)malloc(zone)
+#define ZMDNET_ZONE_FREE(zone, element) {free(element);}
+#define ZMDNET_ZONE_DESTROY(zone)
+
+#ifndef ZMDNET_MALLOC_WAIT
+#define ZMDNET_MALLOC_WAIT(mret,type,size) \
+    do\
+    {\
+     mret = (type*) malloc(size);\
+    } while (!mret)
+#endif
+
+#ifndef ZMDNET_DEBUG_USR
+#define ZMDNET_DEBUG_USR 0x80000000
+#endif
 
 struct mbstat mbstat;
 #define KIPC_MAX_LINKHDR        4       /* int: max length of link header (see sys/sysclt.h) */
@@ -59,9 +65,9 @@ int max_protohdr = KIPC_MAX_PROTOHDR; /* Size of largest protocol layer header. 
 /*
  * Zones from which we allocate.
  */
-sctp_zone_t zone_mbuf;
-sctp_zone_t zone_clust;
-sctp_zone_t zone_ext_refcnt;
+zmdnet_zone_t zone_mbuf;
+zmdnet_zone_t zone_clust;
+zmdnet_zone_t zone_ext_refcnt;
 
 /* __Userspace__ clust_mb_args will be passed as callback data to mb_ctor_clust
  * and mb_dtor_clust.
@@ -70,165 +76,61 @@ sctp_zone_t zone_ext_refcnt;
  */
 struct clust_args clust_mb_args;
 
-/* __Userspace__
- * Local prototypes.
- */
 static int mb_ctor_mbuf(void *, void *, int);
 static int mb_ctor_clust(void *, void *, int);
-static void mb_dtor_mbuf(void *, void *);
+static void mb_dtor_mbuf(void*);
 static void mb_dtor_clust(void *, void *);
 
 /***************** Functions taken from user_mbuf.h *************/
-
-static int mbuf_constructor_dup(struct mbuf *m, int pkthdr, short type)
-{
-  int flags = pkthdr;
-  if (type == MT_NOINIT)
-    return (0);
-
-  m->m_next = NULL;
-  m->m_nextpkt = NULL;
-  m->m_len = 0;
-  m->m_flags = flags;
-  m->m_type = type;
-  if (flags & M_PKTHDR)
-  {
-    m->m_data = m->m_pktdat;
-    m->m_pkthdr.rcvif = NULL;
-    m->m_pkthdr.len = 0;
-    m->m_pkthdr.header = NULL;
-    m->m_pkthdr.csum_flags = 0;
-    m->m_pkthdr.csum_data = 0;
-    m->m_pkthdr.tso_segsz = 0;
-    m->m_pkthdr.ether_vtag = 0;
-    SLIST_INIT(&m->m_pkthdr.tags);
-  }
-  else
-    m->m_data = m->m_dat;
-
-  return (0);
-}
-
-/* __Userspace__ */
-struct mbuf *
-m_get(int how, short type)
+struct mbuf* m_get(short type)
 {
   struct mbuf *mret;
-#if defined(ZMDNET_SIMPLE_ALLOCATOR)
   struct mb_args mbuf_mb_args;
   mbuf_mb_args.flags = 0;
   mbuf_mb_args.type = type;
-#endif
-  /* Mbuf master zone, zone_mbuf, has already been
-   * created in mbuf_initialize() */
-  mret = SCTP_ZONE_GET(zone_mbuf, struct mbuf);
-#if defined(ZMDNET_SIMPLE_ALLOCATOR)
+  // zone_mbuf has already been created in mbuf_initialize()
+  ZMDNET_MALLOC_WAIT(mret, struct mbuf, zone_mbuf);
   mb_ctor_mbuf(mret, &mbuf_mb_args, 0);
-#endif
-  /*mret =  ((struct mbuf *)umem_cache_alloc(zone_mbuf, UMEM_DEFAULT));*/
-
-  /* There are cases when an object available in the current CPU's
-   * loaded magazine and in those cases the object's constructor is not applied.
-   * If that is the case, then we are duplicating constructor initialization here,
-   * so that the mbuf is properly constructed before returning it.
-   */
-  if (mret)
-  {
-#if USING_MBUF_CONSTRUCTOR
-    if (! (mret->m_type == type) )
-    {
-      mbuf_constructor_dup(mret, 0, type);
-    }
-#else
-    mbuf_constructor_dup(mret, 0, type);
-#endif
-
-  }
   return mret;
 }
 
-/* __Userspace__ */
-struct mbuf *
-m_gethdr(int how, short type)
+struct mbuf* m_gethdr(short type)
 {
   struct mbuf *mret;
-#if defined(ZMDNET_SIMPLE_ALLOCATOR)
   struct mb_args mbuf_mb_args;
-
-  /* The following setter function is not yet being enclosed within
-   * #if USING_MBUF_CONSTRUCTOR - #endif, until I have thoroughly tested
-   * mb_dtor_mbuf. See comment there
-   */
   mbuf_mb_args.flags = M_PKTHDR;
   mbuf_mb_args.type = type;
-#endif
-  mret = SCTP_ZONE_GET(zone_mbuf, struct mbuf);
-#if defined(ZMDNET_SIMPLE_ALLOCATOR)
+  ZMDNET_MALLOC_WAIT(mret, struct mbuf, zone_mbuf);
   mb_ctor_mbuf(mret, &mbuf_mb_args, 0);
-#endif
-  /*mret = ((struct mbuf *)umem_cache_alloc(zone_mbuf, UMEM_DEFAULT));*/
-  /* There are cases when an object available in the current CPU's
-   * loaded magazine and in those cases the object's constructor is not applied.
-   * If that is the case, then we are duplicating constructor initialization here,
-   * so that the mbuf is properly constructed before returning it.
-   */
-  if (mret)
-  {
-#if USING_MBUF_CONSTRUCTOR
-    if (! ((mret->m_flags & M_PKTHDR) && (mret->m_type == type)) )
-    {
-      mbuf_constructor_dup(mret, M_PKTHDR, type);
-    }
-#else
-    mbuf_constructor_dup(mret, M_PKTHDR, type);
-#endif
-  }
   return mret;
 }
 
-/* __Userspace__ */
-struct mbuf *
-m_free(struct mbuf *m)
+struct mbuf * m_free(struct mbuf *m)
 {
-
   struct mbuf *n = m->m_next;
-
   if (m->m_flags & M_EXT)
     mb_free_ext(m);
-  else if ((m->m_flags & M_NOFREE) == 0)
+  else if (!(m->m_flags & M_NOFREE))
   {
-#if defined(ZMDNET_SIMPLE_ALLOCATOR)
-    mb_dtor_mbuf(m, NULL);
-#endif
-    SCTP_ZONE_FREE(zone_mbuf, m);
+    mb_dtor_mbuf(m);
+    free(m);
   }
-  /*umem_cache_free(zone_mbuf, m);*/
   return (n);
 }
 
-static void clust_constructor_dup(caddr_t m_clust, struct mbuf* m)
+static void clust_constructor(caddr_t m_clust, struct mbuf* m)
 {
   u_int *refcnt;
   int type, size;
 
   if (m == NULL)
-  {
     return;
-  }
+
   /* Assigning cluster of MCLBYTES. TODO: Add jumbo frame functionality */
   type = EXT_CLUSTER;
   size = MCLBYTES;
 
-  refcnt = SCTP_ZONE_GET(zone_ext_refcnt, u_int);
-  /*refcnt = (u_int *)umem_cache_alloc(zone_ext_refcnt, UMEM_DEFAULT);*/
-#if !defined(ZMDNET_SIMPLE_ALLOCATOR)
-  if (refcnt == NULL)
-  {
-    umem_reap();
-    refcnt = SCTP_ZONE_GET(zone_ext_refcnt, u_int);
-    /*refcnt = (u_int *)umem_cache_alloc(zone_ext_refcnt, UMEM_DEFAULT);*/
-  }
-#endif
+  refcnt = ZMDNET_ZONE_GET(zone_ext_refcnt, u_int);
   *refcnt = 1;
   m->m_ext.ext_buf = (caddr_t) m_clust;
   m->m_data = m->m_ext.ext_buf;
@@ -241,55 +143,23 @@ static void clust_constructor_dup(caddr_t m_clust, struct mbuf* m)
   return;
 }
 
-/* __Userspace__ */
-void m_clget(struct mbuf *m, int how)
+void m_clget(struct mbuf *m)
 {
   caddr_t mclust_ret;
-#if defined(ZMDNET_SIMPLE_ALLOCATOR)
   struct clust_args clust_mb_args_l;
-#endif
   if (m->m_flags & M_EXT)
   {
-    SCTPDBG(SCTP_DEBUG_USR, "%s: %p mbuf already has cluster\n", __func__,
+    ZMDNET_DBG(ZMDNET_DEBUG_USR, "%s: %p mbuf already has cluster\n", __func__,
         (void *) m);
   }
   m->m_ext.ext_buf = (char *) NULL;
-#if defined(ZMDNET_SIMPLE_ALLOCATOR)
   clust_mb_args_l.parent_mbuf = m;
-#endif
-  mclust_ret = SCTP_ZONE_GET(zone_clust, char);
-#if defined(ZMDNET_SIMPLE_ALLOCATOR)
+  ZMDNET_MALLOC_WAIT(mclust_ret, char, zone_clust);
   mb_ctor_clust(mclust_ret, &clust_mb_args_l, 0);
-#endif
-  /*mclust_ret = umem_cache_alloc(zone_clust, UMEM_DEFAULT);*/
-  /*
-   On a cluster allocation failure, call umem_reap() and retry.
-   */
-
-  if (mclust_ret == NULL)
-  {
-#if !defined(ZMDNET_SIMPLE_ALLOCATOR)
-    /*  mclust_ret = SCTP_ZONE_GET(zone_clust, char);
-     mb_ctor_clust(mclust_ret, &clust_mb_args, 0);
-     #else*/
-    umem_reap();
-    mclust_ret = SCTP_ZONE_GET(zone_clust, char);
-#endif
-    /*mclust_ret = umem_cache_alloc(zone_clust, UMEM_DEFAULT);*/
-    if (NULL == mclust_ret)
-    {
-      SCTPDBG(SCTP_DEBUG_USR, "Memory allocation failure in %s\n", __func__);
-    }
-  }
-
-#if USING_MBUF_CONSTRUCTOR
   if ((m->m_ext.ext_buf == NULL))
   {
-    clust_constructor_dup(mclust_ret, m);
+    clust_constructor(mclust_ret, m);
   }
-#else
-  clust_constructor_dup(mclust_ret, m);
-#endif
 }
 
 /*
@@ -325,15 +195,11 @@ static __inline void m_tag_setup(struct m_tag *t, u_int32_t cookie, int type,
   t->m_tag_cookie = cookie;
 }
 
-/************ End functions from user_mbuf.h  ******************/
-
-/************ End functions to substitute umem_cache_alloc and umem_cache_free **************/
-
 void mbuf_initialize(void *dummy)
 {
-  SCTP_ZONE_INIT(zone_mbuf, MBUF_MEM_NAME, MSIZE, 0);
-  SCTP_ZONE_INIT(zone_ext_refcnt, MBUF_EXTREFCNT_MEM_NAME, sizeof(u_int), 0);
-  SCTP_ZONE_INIT(zone_clust, MBUF_CLUSTER_MEM_NAME, MCLBYTES, 0);
+  zone_mbuf = MSIZE;
+  zone_ext_refcnt = sizeof(u_int);
+  zone_clust = MCLBYTES;
 
   mbstat.m_mbufs = 0;
   mbstat.m_mclustsifnet = 0;
@@ -348,52 +214,23 @@ void mbuf_initialize(void *dummy)
   mbstat.m_mcfail = mbstat.m_mpfail = 0;
   mbstat.sf_iocnt = 0;
   mbstat.sf_allocwait = mbstat.sf_allocfail = 0;
-
 }
 
-/*
- * __Userspace__
- *
- * Constructor for Mbuf master zone. We have a different constructor
- * for allocating the cluster.
- *
- * The 'arg' pointer points to a mb_args structure which
- * contains call-specific information required to support the
- * mbuf allocation API.  See user_mbuf.h.
- *
- * The flgs parameter below can be UMEM_DEFAULT or UMEM_NOFAIL depending on what
- * was passed when umem_cache_alloc was called.
- * TODO: Use UMEM_NOFAIL in umem_cache_alloc and also define a failure handler
- * and call umem_nofail_callback(my_failure_handler) in the stack initialization routines
- * The advantage of using UMEM_NOFAIL is that we don't have to check if umem_cache_alloc
- * was successful or not. The failure handler would take care of it, if we use the UMEM_NOFAIL
- * flag.
- *
- * NOTE Ref: http://docs.sun.com/app/docs/doc/819-2243/6n4i099p2?l=en&a=view&q=umem_zalloc)
- * The umem_nofail_callback() function sets the **process-wide** UMEM_NOFAIL callback.
- * It also mentions that umem_nofail_callback is Evolving.
- *
- */
 static int mb_ctor_mbuf(void *mem, void *arg, int flgs)
 {
-#if USING_MBUF_CONSTRUCTOR
   struct mbuf *m;
   struct mb_args *args;
 
   int flags;
   short type;
 
-  m = (struct mbuf *)mem;
-  args = (struct mb_args *)arg;
+  m = (struct mbuf *) mem;
+  args = (struct mb_args *) arg;
   flags = args->flags;
   type = args->type;
 
-  /*
-   * The mbuf is initialized later.
-   *
-   */
   if (type == MT_NOINIT)
-  return (0);
+    return (0);
 
   m->m_next = NULL;
   m->m_nextpkt = NULL;
@@ -413,63 +250,40 @@ static int mb_ctor_mbuf(void *mem, void *arg, int flgs)
     SLIST_INIT(&m->m_pkthdr.tags);
   }
   else
-  m->m_data = m->m_dat;
-#endif
+    m->m_data = m->m_dat;
   return (0);
 }
 
-/*
- * __Userspace__
- * The Mbuf master zone destructor.
- * This would be called in response to umem_cache_destroy
- * TODO: Recheck if this is what we want to do in this destructor.
- * (Note: the number of times mb_dtor_mbuf is called is equal to the
- * number of individual mbufs allocated from zone_mbuf.
- */
-static void mb_dtor_mbuf(void *mem, void *arg)
+static void mb_dtor_mbuf(void *mem)
 {
-  struct mbuf *m;
-
-  m = (struct mbuf *) mem;
-  if ((m->m_flags & M_PKTHDR) != 0)
+  struct mbuf *m = (struct mbuf *) mem;
+  if (m->m_flags & M_PKTHDR)
   {
     m_tag_delete_chain(m, NULL);
   }
 }
 
-/* __Userspace__
- * The Cluster zone constructor.
- *
- * Here the 'arg' pointer points to the Mbuf which we
- * are configuring cluster storage for.  If 'arg' is
- * empty we allocate just the cluster without setting
- * the mbuf to it.  See mbuf.h.
- */
 static int mb_ctor_clust(void *mem, void *arg, int flgs)
 {
-
-#if USING_MBUF_CONSTRUCTOR
   struct mbuf *m;
   struct clust_args * cla;
   u_int *refcnt;
   int type, size;
-  sctp_zone_t zone;
+  zmdnet_zone_t zone;
 
-  /* Assigning cluster of MCLBYTES. TODO: Add jumbo frame functionality */
   type = EXT_CLUSTER;
   zone = zone_clust;
   size = MCLBYTES;
 
-  cla = (struct clust_args *)arg;
+  cla = (struct clust_args *) arg;
   m = cla->parent_mbuf;
 
-  refcnt = SCTP_ZONE_GET(zone_ext_refcnt, u_int);
-  /*refcnt = (u_int *)umem_cache_alloc(zone_ext_refcnt, UMEM_DEFAULT);*/
+  refcnt = ZMDNET_ZONE_GET(zone_ext_refcnt, u_int);
   *refcnt = 1;
 
   if (m != NULL)
   {
-    m->m_ext.ext_buf = (caddr_t)mem;
+    m->m_ext.ext_buf = (caddr_t) mem;
     m->m_data = m->m_ext.ext_buf;
     m->m_flags |= M_EXT;
     m->m_ext.ext_free = NULL;
@@ -478,32 +292,20 @@ static int mb_ctor_clust(void *mem, void *arg, int flgs)
     m->m_ext.ext_type = type;
     m->m_ext.ref_cnt = refcnt;
   }
-#endif
+
   return (0);
 }
 
-/* __Userspace__ */
 static void mb_dtor_clust(void *mem, void *arg)
 {
-
-  /* mem is of type caddr_t.  In sys/types.h we have typedef char * caddr_t;  */
-  /* mb_dtor_clust is called at time of umem_cache_destroy() (the number of times
-   * mb_dtor_clust is called is equal to the number of individual mbufs allocated
-   * from zone_clust. Similarly for mb_dtor_mbuf).
-   * At this point the following:
-   *  struct mbuf *m;
-   *   m = (struct mbuf *)arg;
-   *  assert (*(m->m_ext.ref_cnt) == 0); is not meaningful since  m->m_ext.ref_cnt = NULL;
-   *  has been done in mb_free_ext().
-   */
 
 }
 
 /* Unlink and free a packet tag. */
 void m_tag_delete(struct mbuf *m, struct m_tag *t)
 {
-  KASSERT(m && t,
-      ("m_tag_delete: null argument, m %p t %p", (void *)m, (void *)t));
+  ZMDNET_ASSERT(m && t,
+      ("m_tag_delete: null argument, m %p t %p", (void *) m, (void *) t));
   m_tag_unlink(m, t);
   m_tag_free(t);
 }
@@ -514,7 +316,7 @@ void m_tag_delete_chain(struct mbuf *m, struct m_tag *t)
 
   struct m_tag *p, *q;
 
-  KASSERT(m, ("m_tag_delete_chain: null mbuf"));
+  ZMDNET_ASSERT(m, ("m_tag_delete_chain: null mbuf"));
   if (t != NULL)
     p = t;
   else
@@ -526,19 +328,16 @@ void m_tag_delete_chain(struct mbuf *m, struct m_tag *t)
   m_tag_delete(m, p);
 }
 
-#if 0
-static void
-sctp_print_mbuf_chain(struct mbuf *m)
+static void zmdnet_print_mbuf_chain(struct mbuf *m)
 {
-  SCTP_DEBUG_USR(SCTP_DEBUG_USR, "Printing mbuf chain %p.\n", (void *)m);
-  for(; m; m=m->m_next)
+  ZMDNET_DEBUG(ZMDNET_DEBUG_USR, "Printing mbuf chain %p.\n", (void *) m);
+  for (; m; m = m->m_next)
   {
-    SCTP_DEBUG_USR(SCTP_DEBUG_USR, "%p: m_len = %ld, m_type = %x, m_next = %p.\n", (void *)m, m->m_len, m->m_type, (void *)m->m_next);
+    ZMDNET_DEBUG(ZMDNET_DEBUG_USR, "%p: m_len = %ld, m_type = %x, m_next = %p.\n", (void *) m, m->m_len, m->m_type, (void *) m->m_next);
     if (m->m_flags & M_EXT)
-    SCTP_DEBUG_USR(SCTP_DEBUG_USR, "%p: extend_size = %d, extend_buffer = %p, ref_cnt = %d.\n", (void *)m, m->m_ext.ext_size, (void *)m->m_ext.ext_buf, *(m->m_ext.ref_cnt));
+      ZMDNET_DEBUG(ZMDNET_DEBUG_USR, "%p: extend_size = %d, extend_buffer = %p, ref_cnt = %d.\n", (void *) m, m->m_ext.ext_size, (void *) m->m_ext.ext_buf, *(m->m_ext.ref_cnt));
   }
 }
-#endif
 
 /*
  * Free an entire chain of mbufs and associated external buffers, if
@@ -551,7 +350,6 @@ void m_freem(struct mbuf *mb)
 }
 
 /*
- * __Userspace__
  * clean mbufs with M_EXT storage attached to them
  * if the reference count hits 1.
  */
@@ -560,37 +358,25 @@ void mb_free_ext(struct mbuf *m)
 
   int skipmbuf;
 
-  KASSERT((m->m_flags & M_EXT) == M_EXT, ("%s: M_EXT not set", __func__));
-  KASSERT(m->m_ext.ref_cnt != NULL, ("%s: ref_cnt not set", __func__));
+  ZMDNET_ASSERT((m->m_flags & M_EXT) == M_EXT, ("%s: M_EXT not set", __func__));
+  ZMDNET_ASSERT(m->m_ext.ref_cnt != NULL, ("%s: ref_cnt not set", __func__));
 
   /*
    * check if the header is embedded in the cluster
    */
   skipmbuf = (m->m_flags & M_NOFREE);
 
-  /* Free the external attached storage if this
-   * mbuf is the only reference to it.
-   *__Userspace__ TODO: jumbo frames
-   *
-   */
-  /* NOTE: We had the same code that SCTP_DECREMENT_AND_CHECK_REFCOUNT
-   reduces to here before but the IPHONE malloc commit had changed
-   this to compare to 0 instead of 1 (see next line).  Why?
-   . .. this caused a huge memory leak in Linux.
-   */
 #ifdef IPHONE
   if (atomic_fetchadd_int(m->m_ext.ref_cnt, -1) == 0)
 #else
-  if (SCTP_DECREMENT_AND_CHECK_REFCOUNT(m->m_ext.ref_cnt))
+  if (ZMDNET_DECREMENT_AND_CHECK_REFCOUNT(m->m_ext.ref_cnt))
 #endif
   {
     if (m->m_ext.ext_type == EXT_CLUSTER)
     {
-#if defined(ZMDNET_SIMPLE_ALLOCATOR)
       mb_dtor_clust(m->m_ext.ext_buf, &clust_mb_args);
-#endif
-      SCTP_ZONE_FREE(zone_clust, m->m_ext.ext_buf);
-      SCTP_ZONE_FREE(zone_ext_refcnt, (u_int*) m->m_ext.ref_cnt);
+      ZMDNET_ZONE_FREE(zone_clust, m->m_ext.ext_buf);
+      ZMDNET_ZONE_FREE(zone_ext_refcnt, (u_int*) m->m_ext.ref_cnt);
       m->m_ext.ref_cnt = NULL;
     }
   }
@@ -609,10 +395,8 @@ void mb_free_ext(struct mbuf *m)
   m->m_ext.ext_size = 0;
   m->m_ext.ext_type = 0;
   m->m_flags &= ~M_EXT;
-#if defined(ZMDNET_SIMPLE_ALLOCATOR)
-  mb_dtor_mbuf(m, NULL);
-#endif
-  SCTP_ZONE_FREE(zone_mbuf, m);
+  mb_dtor_mbuf(m);
+  ZMDNET_ZONE_FREE(zone_mbuf, m);
 
   /*umem_cache_free(zone_mbuf, m);*/
 }
@@ -665,7 +449,7 @@ m_pullup(struct mbuf *n, int len)
   {
     if (len > MHLEN)
       goto bad;
-    MGET(m, M_NOWAIT, n->m_type);
+    MGET(m, n->m_type);
     if (m == NULL)
       goto bad;
     m->m_len = 0;
@@ -749,7 +533,7 @@ m_pulldown(struct mbuf *m, int off, int len, int *offp)
   int writable;
 
   /* check invalid arguments. */
-  KASSERT(m, ("m == NULL in m_pulldown()"));
+  ZMDNET_ASSERT(m, ("m == NULL in m_pulldown()"));
   if (len > MCLBYTES)
   {
     m_freem(m);
@@ -759,10 +543,10 @@ m_pulldown(struct mbuf *m, int off, int len, int *offp)
 #ifdef PULLDOWN_DEBUG
   {
     struct mbuf *t;
-    SCTP_DEBUG_USR(SCTP_DEBUG_USR, "before:");
+    ZMDNET_DEBUG_USR(ZMDNET_DEBUG_USR, "before:");
     for (t = m; t; t = t->m_next)
-    SCTP_DEBUG_USR(SCTP_DEBUG_USR, " %d", t->m_len);
-    SCTP_DEBUG_USR(SCTP_DEBUG_USR, "\n");
+    ZMDNET_DEBUG_USR(ZMDNET_DEBUG_USR, " %d", t->m_len);
+    ZMDNET_DEBUG_USR(ZMDNET_DEBUG_USR, "\n");
   }
 #endif
   n = m;
@@ -802,7 +586,7 @@ m_pulldown(struct mbuf *m, int off, int len, int *offp)
    */
   if (len <= n->m_len - off)
   {
-    o = m_dup1(n, off, n->m_len - off, M_NOWAIT);
+    o = m_dup1(n, off, n->m_len - off);
     if (o == NULL)
     {
       m_freem(m);
@@ -864,10 +648,10 @@ m_pulldown(struct mbuf *m, int off, int len, int *offp)
    * on both end.
    */
   if (len > MLEN)
-    m_clget(o, M_NOWAIT);
+    m_clget(o);
   /* o = m_getcl(M_NOWAIT, m->m_type, 0);*/
   else
-    o = m_get(M_NOWAIT, m->m_type);
+    o = m_get(m->m_type);
   if (!o)
   {
     m_freem(m);
@@ -889,10 +673,10 @@ m_pulldown(struct mbuf *m, int off, int len, int *offp)
 #ifdef PULLDOWN_DEBUG
   {
     struct mbuf *t;
-    SCTP_DEBUG_USR(SCTP_DEBUG_USR, "after:");
+    ZMDNET_DEBUG_USR(ZMDNET_DEBUG_USR, "after:");
     for (t = m; t; t = t->m_next)
-    SCTP_DEBUG_USR(SCTP_DEBUG_USR, "%c%d", t == n ? '*' : ' ', t->m_len);
-    SCTP_DEBUG_USR(SCTP_DEBUG_USR, " (off=%d)\n", off);
+    ZMDNET_DEBUG_USR(ZMDNET_DEBUG_USR, "%c%d", t == n ? '*' : ' ', t->m_len);
+    ZMDNET_DEBUG_USR(ZMDNET_DEBUG_USR, " (off=%d)\n", off);
   }
 #endif
   if (offp)
@@ -906,9 +690,9 @@ m_pulldown(struct mbuf *m, int off, int len, int *offp)
  */
 static void mb_dupcl(struct mbuf *n, struct mbuf *m)
 {
-  KASSERT((m->m_flags & M_EXT) == M_EXT, ("%s: M_EXT not set", __func__));
-  KASSERT(m->m_ext.ref_cnt != NULL, ("%s: ref_cnt not set", __func__));
-  KASSERT((n->m_flags & M_EXT) == 0, ("%s: M_EXT set", __func__));
+  ZMDNET_ASSERT((m->m_flags & M_EXT) == M_EXT, ("%s: M_EXT not set", __func__));
+  ZMDNET_ASSERT(m->m_ext.ref_cnt != NULL, ("%s: ref_cnt not set", __func__));
+  ZMDNET_ASSERT((n->m_flags & M_EXT) == 0, ("%s: M_EXT set", __func__));
 
   if (*(m->m_ext.ref_cnt) == 1)
     *(m->m_ext.ref_cnt) += 1;
@@ -939,14 +723,14 @@ m_copym(struct mbuf *m, int off0, int len, int wait)
   struct mbuf *top;
   int copyhdr = 0;
 
-  KASSERT(off >= 0, ("m_copym, negative off %d", off));
-  KASSERT(len >= 0, ("m_copym, negative len %d", len));
+  ZMDNET_ASSERT(off >= 0, ("m_copym, negative off %d", off));
+  ZMDNET_ASSERT(len >= 0, ("m_copym, negative len %d", len));
 
-  if (off == 0 && m->m_flags & M_PKTHDR)
+  if (off == 0 && (m->m_flags & M_PKTHDR))
     copyhdr = 1;
   while (off > 0)
   {
-    KASSERT(m != NULL, ("m_copym, offset > size of mbuf chain"));
+    ZMDNET_ASSERT(m != NULL, ("m_copym, offset > size of mbuf chain"));
     if (off < m->m_len)
       break;
     off -= m->m_len;
@@ -958,13 +742,13 @@ m_copym(struct mbuf *m, int off0, int len, int wait)
   {
     if (m == NULL)
     {
-      KASSERT(len == M_COPYALL, ("m_copym, length > size of mbuf chain"));
+      ZMDNET_ASSERT(len == M_COPYALL, ("m_copym, length > size of mbuf chain"));
       break;
     }
     if (copyhdr)
-      MGETHDR(n, wait, m->m_type);
+      MGETHDR(n, m->m_type);
     else
-      MGET(n, wait, m->m_type);
+      MGET(n, m->m_type);
     *np = n;
     if (n == NULL)
       goto nospace;
@@ -993,11 +777,11 @@ m_copym(struct mbuf *m, int off0, int len, int wait)
     np = &n->m_next;
   }
   if (top == NULL)
-    mbstat.m_mcfail++; /* XXX: No consistency. */
+    mbstat.m_mcfail++;
 
   return (top);
   nospace: m_freem(top);
-  mbstat.m_mcfail++; /* XXX: No consistency. */
+  mbstat.m_mcfail++;
   return (NULL);
 }
 
@@ -1005,8 +789,8 @@ int m_tag_copy_chain(struct mbuf *to, struct mbuf *from, int how)
 {
   struct m_tag *p, *t, *tprev = NULL;
 
-  KASSERT(to && from,
-      ("m_tag_copy_chain: null argument, to %p from %p", (void *)to, (void *)from));
+  ZMDNET_ASSERT(to && from,
+      ("m_tag_copy_chain: null argument, to %p from %p", (void *) to, (void *) from));
   m_tag_delete_chain(to, NULL);
   SLIST_FOREACH(p, &from->m_pkthdr.tags, m_tag_link)
   {
@@ -1033,8 +817,8 @@ int m_tag_copy_chain(struct mbuf *to, struct mbuf *from, int how)
 int m_dup_pkthdr(struct mbuf *to, struct mbuf *from, int how)
 {
 
-  KASSERT(to, ("m_dup_pkthdr: to is NULL"));
-  KASSERT(from, ("m_dup_pkthdr: from is NULL"));
+  ZMDNET_ASSERT(to, ("m_dup_pkthdr: to is NULL"));
+  ZMDNET_ASSERT(from, ("m_dup_pkthdr: from is NULL"));
   to->m_flags = (from->m_flags & M_COPYFLAGS) | (to->m_flags & M_EXT);
   if ((to->m_flags & M_EXT) == 0)
     to->m_data = to->m_pktdat;
@@ -1049,7 +833,7 @@ m_tag_copy(struct m_tag *t, int how)
 {
   struct m_tag *p;
 
-  KASSERT(t, ("m_tag_copy: null tag"));
+  ZMDNET_ASSERT(t, ("m_tag_copy: null tag"));
   p = m_tag_alloc(t->m_tag_cookie, t->m_tag_id, t->m_tag_len, how);
   if (p == NULL)
     return (NULL);
@@ -1098,7 +882,7 @@ void m_copyback(struct mbuf *m0, int off, int len, caddr_t cp)
     totlen += mlen;
     if (m->m_next == NULL)
     {
-      n = m_get(M_NOWAIT, m->m_type);
+      n = m_get(m->m_type);
       if (n == NULL)
         goto out;
       memset(mtod(n, caddr_t), 0, MLEN);
@@ -1120,7 +904,7 @@ void m_copyback(struct mbuf *m0, int off, int len, caddr_t cp)
       break;
     if (m->m_next == NULL)
     {
-      n = m_get(M_NOWAIT, m->m_type);
+      n = m_get(m->m_type);
       if (n == NULL)
         break;
       n->m_len = min(MLEN, len);
@@ -1143,9 +927,9 @@ m_prepend(struct mbuf *m, int len, int how)
   struct mbuf *mn;
 
   if (m->m_flags & M_PKTHDR)
-    MGETHDR(mn, how, m->m_type);
+    MGETHDR(mn, m->m_type);
   else
-    MGET(mn, how, m->m_type);
+    MGET(mn, m->m_type);
   if (mn == NULL)
   {
     m_freem(m);
@@ -1177,11 +961,11 @@ void m_copydata(const struct mbuf *m, int off, int len, caddr_t cp)
 {
   u_int count;
 
-  KASSERT(off >= 0, ("m_copydata, negative off %d", off));
-  KASSERT(len >= 0, ("m_copydata, negative len %d", len));
+  ZMDNET_ASSERT(off >= 0, ("m_copydata, negative off %d", off));
+  ZMDNET_ASSERT(len >= 0, ("m_copydata, negative len %d", len));
   while (off > 0)
   {
-    KASSERT(m != NULL, ("m_copydata, offset > size of mbuf chain"));
+    ZMDNET_ASSERT(m != NULL, ("m_copydata, offset > size of mbuf chain"));
     if (off < m->m_len)
       break;
     off -= m->m_len;
@@ -1189,7 +973,7 @@ void m_copydata(const struct mbuf *m, int off, int len, caddr_t cp)
   }
   while (len > 0)
   {
-    KASSERT(m != NULL, ("m_copydata, length > size of mbuf chain"));
+    ZMDNET_ASSERT(m != NULL, ("m_copydata, length > size of mbuf chain"));
     count = min(m->m_len - off, len);
     memcpy(cp, mtod(m, caddr_t) + off, count);
     len -= count;
@@ -1210,7 +994,7 @@ void m_cat(struct mbuf *m, struct mbuf *n)
     m = m->m_next;
   while (n)
   {
-    if (m->m_flags & M_EXT
+    if ((m->m_flags & M_EXT)
         || m->m_data + m->m_len + n->m_len >= &m->m_dat[MLEN])
     {
       /* just join the two chains */
@@ -1309,7 +1093,7 @@ void m_adj(struct mbuf *mp, int req_len)
   }
 }
 
-/* m_split is used within sctp_handle_cookie_echo. */
+/* m_split is used within zmdnet_handle_cookie_echo. */
 
 /*
  * Partition an mbuf chain in two pieces, returning the tail --
@@ -1335,7 +1119,7 @@ m_split(struct mbuf *m0, int len0, int wait)
   remain = m->m_len - len;
   if (m0->m_flags & M_PKTHDR)
   {
-    MGETHDR(n, wait, m0->m_type);
+    MGETHDR(n, m0->m_type);
     if (n == NULL)
       return (NULL);
     n->m_pkthdr.rcvif = m0->m_pkthdr.rcvif;
@@ -1370,7 +1154,7 @@ m_split(struct mbuf *m0, int len0, int wait)
   }
   else
   {
-    MGET(n, wait, m->m_type);
+    MGET(n, m->m_type);
     if (n == NULL)
       return (NULL);
     M_ALIGN(n, remain);

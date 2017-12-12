@@ -463,7 +463,11 @@ struct selinfo
 
 #include "zmdnet-atomic.h"
 
-
+#define ZMDNET_MALLOC_WAIT(mret,type,size) \
+    do\
+    {\
+      (mret) = ((type)*) malloc((size));\
+    } while (!(mret))
 
 //IAMHERE   sctp_os_userspace.h line 462 #include "user_socketvar.h"
 

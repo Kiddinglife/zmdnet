@@ -55,6 +55,9 @@ static inline void terminate_non_graceful(void)
   abort();
 }
 
+
+#define SCTP_PRINTF(...)
+
 #define panic(...)                                  \
   do {                                        \
     SCTP_PRINTF("%s(): ", __FUNCTION__);\
@@ -63,14 +66,14 @@ static inline void terminate_non_graceful(void)
     terminate_non_graceful();           \
 } while (0)
 
-#define KASSERT(cond, args)          \
+#define ZMDNET_ASSERT(cond, args)          \
   do {                         \
     if (!(cond)) {       \
       panic args ; \
     }                    \
   } while (0)
 #else
-#define KASSERT(cond, args)
+#define ZMDNET_ASSERT(cond, args)
 #endif
 
 /* maxsockets is used in ZMDNET_ZONE_INIT call. It refers to

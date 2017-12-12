@@ -139,7 +139,8 @@ list(APPEND zmdnet_headers
 	zmdnet.h
 	system/zmdnet-env.h
     system/zmdnet-os-user-space.h
-     system/zmdnet-queue.h
+    system/zmdnet-queue.h
+    system/zmdnet-mbuf.h
 	distribution/auth/zmdnet-auth.h
 	adaption/zmdnet-socket.h
 )
@@ -170,6 +171,7 @@ list(APPEND zmdnet_headers
 # 	user_socket.c
 # )
 list(APPEND zmdnet_sources
+    system/zmdnet-mbuf.c
 	system/zmdnet-env.c
 	distribution/auth/zmdnet-auth.c
 	adaption/zmdnet-socket.c

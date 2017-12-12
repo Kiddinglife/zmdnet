@@ -49,18 +49,18 @@ struct ifnet;
 #define MCLBYTES 2048
 #endif
 
-struct mbuf * m_gethdr(int how, short type);
-struct mbuf * m_get(int how, short type);
+struct mbuf * m_gethdr(short type);
+struct mbuf * m_get(short type);
 struct mbuf * m_free(struct mbuf *m);
-void m_clget(struct mbuf *m, int how);
+void m_clget(struct mbuf *m);
 
 /* mbuf initialization function */
 void mbuf_initialize(void *);
 
 #define M_MOVE_PKTHDR(to, from) m_move_pkthdr((to), (from))
-#define MGET(m, how, type)  ((m) = m_get((how), (type)))
-#define MGETHDR(m, how, type)   ((m) = m_gethdr((how), (type)))
-#define MCLGET(m, how)      m_clget((m), (how))
+#define MGET(m,type)  m = m_get(type)
+#define MGETHDR(m, type)   m = m_gethdr(type)
+#define MCLGET(m)      m_clget(m)
 
 #define M_HDR_PAD ((sizeof(intptr_t)==4) ? 2 : 6) /* modified for __Userspace__ */
 
@@ -71,11 +71,11 @@ void mbuf_initialize(void *);
  * typedef struct umem_cache umem_cache_t;
  * Note:umem_zone_t is a pointer.
  */
-typedef size_t sctp_zone_t;
+typedef size_t zmdnet_zone_t;
 
-extern sctp_zone_t zone_mbuf;
-extern sctp_zone_t zone_clust;
-extern sctp_zone_t zone_ext_refcnt;
+extern zmdnet_zone_t zone_mbuf;
+extern zmdnet_zone_t zone_clust;
+extern zmdnet_zone_t zone_ext_refcnt;
 
 /*-
  * Macros for type conversion:
@@ -410,9 +410,9 @@ extern struct mbstat mbstat; /* General mbuf stats/infos */
  * object of the specified size at the end of the mbuf, longword aligned.
  */
 #define M_ALIGN(m, len) do {                        \
-        KASSERT(!((m)->m_flags & (M_PKTHDR|M_EXT)),                     \
+        ZMDNET_ASSERT(!((m)->m_flags & (M_PKTHDR|M_EXT)),                     \
                 ("%s: M_ALIGN not normal mbuf", __func__));             \
-        KASSERT((m)->m_data == (m)->m_dat,                              \
+        ZMDNET_ASSERT((m)->m_data == (m)->m_dat,                              \
                 ("%s: M_ALIGN not a virgin mbuf", __func__));           \
     (m)->m_data += (MLEN - (len)) & ~(sizeof(long) - 1);        \
 } while (0)
@@ -422,9 +422,9 @@ extern struct mbstat mbstat; /* General mbuf stats/infos */
  * M_DUP/MOVE_PKTHDR.
  */
 #define MH_ALIGN(m, len) do {                       \
-        KASSERT((m)->m_flags & M_PKTHDR && !((m)->m_flags & M_EXT),     \
+        ZMDNET_ASSERT((m)->m_flags & M_PKTHDR && !((m)->m_flags & M_EXT),     \
                 ("%s: MH_ALIGN not PKTHDR mbuf", __func__));            \
-        KASSERT((m)->m_data == (m)->m_pktdat,                           \
+        ZMDNET_ASSERT((m)->m_data == (m)->m_pktdat,                           \
                 ("%s: MH_ALIGN not a virgin mbuf", __func__));          \
     (m)->m_data += (MHLEN - (len)) & ~(sizeof(long) - 1);       \
 } while (0)
