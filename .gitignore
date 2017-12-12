@@ -125,3 +125,4 @@ msvc/.vs
 *.opendb
 geco-engine.VC.db
 *.idb
+/Debug/

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>makefile-static-lib</name>
+	<name>zmdnetstatic</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -25,29 +25,39 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>.gitignore</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/.gitignore</locationURI>
+		</link>
+		<link>
 			<name>CMakeLists.txt</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/CMakeLists.txt</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/CMakeLists.txt</locationURI>
 		</link>
 		<link>
 			<name>config.h.in</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/config.h.in</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/config.h.in</locationURI>
+		</link>
+		<link>
+			<name>docx</name>
+			<type>2</type>
+			<locationURI>PARENT-2-PROJECT_LOC/docx</locationURI>
 		</link>
 		<link>
 			<name>sample</name>
 			<type>2</type>
-			<locationURI>PARENT-1-PROJECT_LOC/sample</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/sample</locationURI>
 		</link>
 		<link>
 			<name>src</name>
 			<type>2</type>
-			<locationURI>PARENT-1-PROJECT_LOC/src</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/src</locationURI>
 		</link>
 		<link>
 			<name>test</name>
 			<type>2</type>
-			<locationURI>PARENT-1-PROJECT_LOC/test</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/test</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
