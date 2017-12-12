@@ -259,15 +259,19 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="D:\zmdnet\src\system\zmdnet-env.c"  />
-    <ClCompile Include="D:\zmdnet\src\distribution\auth\zmdnet-auth.c"  />
-    <ClCompile Include="D:\zmdnet\src\adaption\zmdnet-socket.c"  />
+    <ClCompile Include="D:\zmdnet\src\zmdnet-mbuf.c"  />
+    <ClCompile Include="D:\zmdnet\src\zmdnet-auth.c"  />
+    <ClCompile Include="D:\zmdnet\src\zmdnet-plateform.c"  />
+    <ClCompile Include="D:\zmdnet\src\zmdnet-socket.c"  />
     <ClInclude Include="D:\zmdnet\src\zmdnet.h" />
-    <ClInclude Include="D:\zmdnet\src\system\zmdnet-env.h" />
-    <ClInclude Include="D:\zmdnet\src\system\zmdnet-os-user-space.h" />
-    <ClInclude Include="D:\zmdnet\src\system\zmdnet-queue.h" />
-    <ClInclude Include="D:\zmdnet\src\distribution\auth\zmdnet-auth.h" />
-    <ClInclude Include="D:\zmdnet\src\adaption\zmdnet-socket.h" />
+    <ClInclude Include="D:\zmdnet\src\zmdnet-atomic.h" />
+    <ClInclude Include="D:\zmdnet\src\zmdnet-icmp.h" />
+    <ClInclude Include="D:\zmdnet\src\zmdnet-plateform.h" />
+    <ClInclude Include="D:\zmdnet\src\zmdnet-queue.h" />
+    <ClInclude Include="D:\zmdnet\src\zmdnet-mbuf.h" />
+    <ClInclude Include="D:\zmdnet\src\zmdnet-auth.h" />
+    <ClInclude Include="D:\zmdnet\src\zmdnet-socket.h" />
+    <ClInclude Include="D:\zmdnet\src\zmdnet-socket-var.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="D:\zmdnet\msvc\ZERO_CHECK.vcxproj">

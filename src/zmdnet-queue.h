@@ -99,7 +99,7 @@
  *
  */
 
-#include "../config.h"
+#include "config.h"
 
 #ifdef ZMDNET_DEBUG
 /* Store the last 2 places the queue element or head was altered */

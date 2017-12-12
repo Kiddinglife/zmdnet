@@ -30,15 +30,8 @@
 
 /* __Userspace__ header file for mbufs */
 
-#include "../config.h"
-
-#include <stdio.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include "zmdnet-queue.h"
-
-struct ifnet;
+#include "config.h"
+#include "zmdnet-plateform.h"
 
 /* For Linux */
 #ifndef MSIZE
@@ -215,8 +208,7 @@ struct pkthdr
 struct m_ext
 {
   caddr_t ext_buf; /* start of buffer */
-  void (*ext_free) /* free routine if not the usual */
-  (void *, void *);
+  void (*ext_free) (void *, void *); /* free routine if not the usual */
   void *ext_args; /* optional argument pointer */
   u_int ext_size; /* size of buffer, for ext_free */
   volatile u_int *ref_cnt; /* pointer to ref count info */

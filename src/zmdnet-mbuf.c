@@ -29,13 +29,12 @@
  *
  */
 
-#include "../config.h"
+#include "config.h"
 
 #include <stdio.h>
 #include <string.h>
 
 #include "zmdnet-mbuf.h"
-#include "zmdnet-env.h"
 #include "zmdnet-atomic.h"
 //#include "netinet/zmdnet_pcb.h"
 
