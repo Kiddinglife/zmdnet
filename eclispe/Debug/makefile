@@ -13,6 +13,7 @@ RM := rm -rf
 -include src/system/subdir.mk
 -include src/distribution/auth/subdir.mk
 -include src/adaption/subdir.mk
+-include src/CMakeFiles/zmdnet.dir/system/subdir.mk
 -include src/CMakeFiles/zmdnet.dir/distribution/auth/subdir.mk
 -include src/CMakeFiles/zmdnet.dir/adaption/subdir.mk
 -include src/CMakeFiles/zmdnet-static.dir/system/subdir.mk

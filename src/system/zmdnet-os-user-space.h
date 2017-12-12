@@ -485,6 +485,7 @@ struct selinfo
 #if defined(ZMDNET_SUPPORT_IPV4) || defined(ZMDNET_SUPPORT_IPV6)
 #include <ifaddrs.h>
 #endif
+#endif
 #include "zmdnet-atomic.h"
 #include "zmdnet-mbuf.h"
 #include <limits.h>
