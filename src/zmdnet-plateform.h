@@ -53,12 +53,12 @@ static inline void terminate_non_graceful(void)
 {
     abort();
 }
-#define SCTP_PRINTF(...)
+#define ZMDNET_PRINTF(...)
 #define panic(...)                                  \
   do {                                        \
-    SCTP_PRINTF("%s(): ", __FUNCTION__);\
-    SCTP_PRINTF(__VA_ARGS__);           \
-    SCTP_PRINTF("\n");                  \
+    ZMDNET_PRINTF("%s(): ", __FUNCTION__);\
+    ZMDNET_PRINTF(__VA_ARGS__);           \
+    ZMDNET_PRINTF("\n");                  \
     terminate_non_graceful();           \
 } while (0)
 
@@ -72,9 +72,9 @@ static inline void terminate_non_graceful(void)
 #define ZMDNET_ASSERT(cond, args)
 #endif
 
-/* maxsockets is used in ZMDNET_ZONE_INIT call. It refers to
-* kern.ipc.maxsockets kernel environment variable.
-*/
+ /* maxsockets is used in ZMDNET_ZONE_INIT call. It refers to
+ * kern.ipc.maxsockets kernel environment variable.
+ */
 extern int maxsockets;
 /* int hz; is declared in sys/kern/subr_param.c and refers to kernel timer frequency.
 * See http://ivoras.sharanet.org/freebsd/vmware.html for additional info about kern.hz
@@ -600,7 +600,11 @@ struct selinfo
 #endif
 #endif /* INET6 */
 
+#ifdef HAVE_SYS_QUEUE_H
 #include <sys/queue.h>
+#else
+#include "zmdnet-queue.h"
+#endif
 
 #if defined(HAVE_PEELOFF_SOCKOPT)
 #include <sys/file.h>
@@ -613,15 +617,95 @@ struct selinfo
 #include <netinet/ip_options.h>
 #endif
 
+#if defined(__FreeBSD__)
+#ifndef in6pcb
+#define in6pcb		inpcb
+#endif
+#endif
+
+// TODO sctp_os_userspace.h at line 592
+//#if defined(ZMDNET_LOCAL_TRACE_BUF)
+//#define ZMDNET_GET_CYCLECOUNT get_cyclecount()
+//#defineZMDNET_CTR6 sctp_log_trace
+//#else
+//#define ZMDNET_CTR6 CTR6
+//#endif
+/* Empty ktr statement for _Userspace__ (similar to what is done for mac) */
+//#define	CTR6(m, d, p1, p2, p3, p4, p5, p6)
+
+/* FIX ME: temp */
+#if !defined(DARWIN)
+#define USER_ADDR_NULL	(NULL)		
+#endif
+
+// todo use same var name eg. g_base_info.debug_printf_func
+#define g_base_info_var(m) g_base_info.m
+//SCTP_BASE_INFO
+#define g_base_info_pcb_var(m) g_base_info.pcbinfo.m 
+//SCTP_BASE_STATS
+#define g_base_info_stats g_base_info.stats 
+//SCTP_BASE_STAT
+#define g_base_info_stats_var(m)     g_base_info.stats.m
+//SCTP_BASE_SYSCTL
+#define g_base_info_sysctl_var(m) g_base_info.sysctl.m 
+
+#define zmdnet_printf(...) if (g_base_info.debug_printf_func) { (g_base_info.debug_printf_func)(__VA_ARGS__); }
+
+#if defined(ZMDNET_DEBUG)
+#include <zmdnet-constant.h>
+#define zmdnet_debug_log(level, ...) {if (g_base_info_sysctl_var(zmdnet_debug_on) & level) {zmdnet_printf(__VA_ARGS__);}}
+#define zmdnet_debug_log_addr(level, addr) {if (g_base_info_sysctl_var(zmdnet_debug_on) & level ) { zmdnet_print_addr(addr);}}
+#else
+#define debug_log(level, ...)
+#define debug_log_addr(level, addr)
+#endif
+
+// ??? i think we only need one macro right? ZMDNET_LOCAL_TRACE_BUF or ZMDNET_LTRACE_CHUNKS ???
+#if defined(ZMDNET_LOCAL_TRACE_BUF)
+#define GET_CYCLECOUNT 0 /*get_cyclecount() // TODO use gettimeofday to get timestamp */
+#define zmdnet_log_trace mlog_trace  /* <<< SCTP_CTR6 */
+#else
+#define zmdnet_log_trace  /* <<< SCTP_CTR6 */
+#endif
+
+#ifdef ZMDNET_LTRACE_CHUNKS
+#define zmdnet_ltrace_chunk(a, b, c, d) \
+if(g_base_info_sysctl_var(logging_level) & ZMDNET_LTRACE_CHUNK_ENABLE) zmdnet_log_trace(KTR_SUBSYS, "SCTP:%d[%d]:%x-%x-%x-%x", SCTP_LOG_CHUNK_PROC, 0, a, b, c, d)
+#else
+#define zmdnet_ltrace_chunk(a, b, c, d)
+#endif
+
+#ifdef  ZMDNET_LTRACE_ERRORS
+#define zmdnet_ltrace_err_ret_pkt(m, inp, stcb, net, file, err) \
+	if (g_base_info_sysctl_var(logging_level) & ZMDNET_LTRACE_ERR_ENABLE) \
+		zmdnet_printf("mbuf:%p inp:%p stcb:%p net:%p file:%x line:%d error:%d\n",  (void *)m, (void *)inp, (void *)stcb, (void *)net, file, __LINE__, err);
+#define zmdnet_ltrace_err_ret(inp, stcb, net, file, err) \
+	if (sctp_logging_level & SCTP_LTRACE_ERROR_ENABLE) \
+		zmdnet_printf("inp:%p stcb:%p net:%p file:%x line:%d error:%d\n",  (void *)inp, (void *)stcb, (void *)net, file, __LINE__, err);
+#else
+#define zmdnet_ltrace_err_ret_pkt(m, inp, stcb, net, file, err)
+#define zmdnet_ltrace_err_ret(inp, stcb, net, file, err)
+#endif
 
 
-/* IPSEC */
-#define ZMDNET_MALLOC_WAIT(mret,type,size) \
-    do\
-    {\
-      mret = (type*) malloc(size);\
-    } while (!mret)
+#define zmdnet_malloc_wait(mret,type,size)  do { mret = (type*) malloc(size);} while (!mret)
 
 //IAMHERE   sctp_os_userspace.h line 462 #include "user_socketvar.h"
+
+
+
+
+#define AF_CONN 123
+struct sockaddr_conn
+{
+#ifdef HAVE_SCONN_LEN
+    uint8_t sconn_len;
+    uint8_t sconn_family;
+#else
+    uint16_t sconn_family;
+#endif
+    uint16_t sconn_port;
+    void *sconn_addr;
+};
 
 #endif /* SRC_SYSTEM_ZMDNET_OS_USER_SPACE_H_ */

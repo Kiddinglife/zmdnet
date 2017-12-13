@@ -41,7 +41,7 @@ extern struct zmdnet_base_info g_base_info;
  */
 struct zmdnet_base_info
 {
-    void (*debug_printf_cb)(const char *format, ...);
+    void (*debug_printf_func)(const char *format, ...);
 };
 
 /*-

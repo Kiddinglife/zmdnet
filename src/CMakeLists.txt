@@ -145,6 +145,10 @@ list(APPEND zmdnet_headers
 	zmdnet-auth.h
 	zmdnet-socket.h
 	zmdnet-socket-var.h
+    zmdnet-constant.h  
+    zmdnet-pcb.h 
+    zmdnet-util.h
+    zmdnet-sysctl.h
 )
 
 # list(APPEND usrsctp_sources
@@ -177,6 +181,8 @@ list(APPEND zmdnet_sources
 	zmdnet-auth.c
     zmdnet-plateform.c
 	zmdnet-socket.c
+    zmdnet-pcb.c
+    zmdnet-util.c
 )
 
 add_library(zmdnet SHARED ${zmdnet_sources} ${zmdnet_headers})
