@@ -1,6 +1,7 @@
 /*-
  * Copyright (c) 1982, 1986, 1990, 1993
  *  The Regents of the University of California.  All rights reserved.
+ * Copyright (c) 2015-2017 Mengdi Zhang
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -43,12 +44,12 @@
 #include <sys/uio.h>
 #endif
 
-#if defined(__APPLE__) || defined(__DragonFly__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined (_WIN32) || defined(__native_client__)
+#if defined(DARWIN) || defined(__DragonFly__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined (_WIN32) || defined(__native_client__)
 #define UIO_MAXIOV 1024
 #define ERESTART (-1)
 #endif
 
-#if !defined(__APPLE__) && !defined(__OpenBSD__) && !defined (__OpenBSD__) && !defined(__native_client__)
+#if !defined(DARWIN) && !defined(__OpenBSD__) && !defined (__OpenBSD__) && !defined(__native_client__)
 enum uio_rw
 {
     UIO_READ, UIO_WRITE

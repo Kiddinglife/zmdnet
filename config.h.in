@@ -15,6 +15,18 @@
 #cmakedefine ZMDNET_SUPPORT_IPV4
 #endif
 
+#ifndef HAVE_PEELOFF_SOCKOPT
+#cmakedefine have_peeloff_sockopt
+#endif
+
+#ifndef ZMDNET_PROCESS_LEVEL_LOCKS
+#cmakedefine ZMDNET_PROCESS_LEVEL_LOCKS
+#endif
+
+#ifndef HAVE_IPSEC
+#cmakedefine have_IPSEC
+#endif
+
 #ifndef ZMDNET_SUPPORT_IPV6
 #cmakedefine ZMDNET_SUPPORT_IPV6
 #endif
@@ -24,7 +36,7 @@
 #endif
 
 #ifndef HAVE_LINUX_IF_ADDR_H
-#cmakedefine HAVE_LINUX_IF_ADDR_H
+#cmakedefine have_linux_if_addr_h
 #endif
 
 #ifndef HAVE_LINUX_RTNETLINK_H

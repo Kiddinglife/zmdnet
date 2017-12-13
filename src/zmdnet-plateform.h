@@ -29,6 +29,7 @@
 #define __ZMDNET_PLATEFORM_H__
 
 #include <errno.h>
+#include <stdint.h>
 #include <sys/types.h>
 
 #ifdef __FreeBSD__
@@ -508,45 +509,113 @@ struct selinfo
 
 #include <stdio.h>
 #include <string.h>
+
 #if defined(HAVE_SYS_QUEUE_H)
 #include <sys/queue.h>
 #else
 #include "zmdnet-queue.h"
 #endif
+
+#include "zmdnet-socket-var.h"
+#include "zmdnet-atomic.h"
+#include "zmdnet-mbuf.h"
+
 #if defined(__FreeBSD__) && __FreeBSD_version > 602000
 #include <sys/rwlock.h>
 #endif
+
 #if defined(__FreeBSD__) && __FreeBSD_version > 602000
 #include <sys/priv.h>
 #endif
+
 #if defined(__DragonFly__)
 /* was a 0 byte file.  needed for structs if_data(64) and net_event_data */
 #include <net/if_var.h>
 #endif
+
 #if defined(__FreeBSD__)
 #include <net/if_types.h>
 #endif
+
 #if !defined(_WIN32) && !defined(__native_client__)
 #include <net/if.h>
 #include <netinet/in.h>
 #include <netinet/in_systm.h>
 #include <netinet/ip.h>
 #endif
+
 #if defined(HAVE_NETINET_IP_ICMP_H)
 #include <netinet/ip_icmp.h>
 #else
 #include <zmdnet-icmp.h>
 #endif
+
+// #include "zmdnet-inpcb.h" // TODO
+#include <limits.h>
+#include <sys/types.h>
+
 #if !defined(_WIN32)
 #if defined(ZMDNET_SUPPORT_IPV4) || defined(ZMDNET_SUPPORT_IPV6)
 #include <ifaddrs.h>
 #endif
+#include <sys/ioctl.h>
+#include <unistd.h> // for close, etc.
 #endif
-#include "zmdnet-atomic.h"
-#include "zmdnet-mbuf.h"
-#include <limits.h>
-#include <sys/types.h>
 
+#include <stddef.h> // for offsetof
+
+#if defined(ZMDNET_PROCESS_LEVEL_LOCKS) && !defined(_WIN32)
+/* for pthread_mutex_lock, pthread_mutex_unlock, etc. */
+#include <pthread.h>
+#endif
+
+#ifdef HAVE_IPSEC
+#include <netipsec/ipsec.h>
+#include <netipsec/key.h>
+#endif
+
+#ifdef ZMDNET_SUPPORT_IPV6
+#if defined(__FreeBSD__)
+#include <sys/domain.h>
+#endif
+
+#ifdef HAVE_IPSEC
+#include <netipsec/ipsec6.h>
+#endif
+
+#if !defined(_WIN32)
+#include <netinet/ip6.h>
+#endif
+
+#if defined(DARWIN) || defined(__FreeBSD__) || defined(__linux__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(_WIN32)
+// #include "zmdnet-ip6var.h" // TODO
+#else
+#include <netinet6/ip6_var.h>
+#endif
+
+#if defined(__FreeBSD__)
+#include <netinet6/in6_pcb.h>
+#include <netinet6/ip6protosw.h>
+#include <netinet6/scope6_var.h>
+#endif
+#endif /* INET6 */
+
+#include <sys/queue.h>
+
+#if defined(HAVE_PEELOFF_SOCKOPT)
+#include <sys/file.h>
+#include <sys/filedesc.h>
+#endif
+
+// #include "zmdnet-sha1.h" //TODO
+
+#if __FreeBSD_version >= 700000
+#include <netinet/ip_options.h>
+#endif
+
+
+
+/* IPSEC */
 #define ZMDNET_MALLOC_WAIT(mret,type,size) \
     do\
     {\
