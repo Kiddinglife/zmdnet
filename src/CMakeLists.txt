@@ -149,6 +149,7 @@ list(APPEND zmdnet_headers
     zmdnet-pcb.h 
     zmdnet-util.h
     zmdnet-sysctl.h
+    mlog.h
 )
 
 # list(APPEND usrsctp_sources
@@ -183,6 +184,7 @@ list(APPEND zmdnet_sources
 	zmdnet-socket.c
     zmdnet-pcb.c
     zmdnet-util.c
+    mlog.c
 )
 
 add_library(zmdnet SHARED ${zmdnet_sources} ${zmdnet_headers})

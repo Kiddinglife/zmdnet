@@ -198,7 +198,7 @@ struct pkthdr
   u_int16_t ether_vtag; /* Ethernet 802.1p+q vlan tag */
   SLIST_HEAD(packet_tags, m_tag)
   tags;
-  /* list of packet tags */
+/* list of packet tags */
 };
 
 /*
@@ -208,7 +208,7 @@ struct pkthdr
 struct m_ext
 {
   caddr_t ext_buf; /* start of buffer */
-  void (*ext_free) (void *, void *); /* free routine if not the usual */
+  void (*ext_free)(void *, void *); /* free routine if not the usual */
   void *ext_args; /* optional argument pointer */
   u_int ext_size; /* size of buffer, for ext_free */
   volatile u_int *ref_cnt; /* pointer to ref count info */

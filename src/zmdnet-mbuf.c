@@ -36,24 +36,14 @@
 
 #include "zmdnet-mbuf.h"
 #include "zmdnet-atomic.h"
-//#include "netinet/zmdnet_pcb.h"
+#include "zmdnet-pcb.h"
+
+#include "mlog.h"
 
 #define ZMDNET_ZONE_INIT(zone, name, size, number) {zone = size;}
 #define ZMDNET_ZONE_GET(zone, type)  (type *)malloc(zone)
 #define ZMDNET_ZONE_FREE(zone, element) {free(element);}
 #define ZMDNET_ZONE_DESTROY(zone)
-
-#ifndef zmdnet_malloc_wait
-#define zmdnet_malloc_wait(mret,type,size) \
-    do\
-    {\
-     mret = (type*) malloc(size);\
-    } while (!mret)
-#endif
-
-#ifndef ZMDNET_DBG
-#define ZMDNET_DBG(...)
-#endif
 
 #ifndef ZMDNET_DEBUG_USR
 #define ZMDNET_DEBUG_USR 0x80000000
@@ -152,7 +142,7 @@ void m_clget(struct mbuf *m)
   struct clust_args clust_mb_args_l;
   if (m->m_flags & M_EXT)
   {
-    ZMDNET_DBG(ZMDNET_DEBUG_USR, "%s: %p mbuf already has cluster\n", __func__,
+    zmdnet_debug(ZMDNET_DEBUG_USR, "%s: %p mbuf already has cluster\n", __func__,
         (void *) m);
   }
   m->m_ext.ext_buf = (char *) NULL;
@@ -331,13 +321,13 @@ void m_tag_delete_chain(struct mbuf *m, struct m_tag *t)
 
 static void zmdnet_print_mbuf_chain(struct mbuf *m)
 {
-  ZMDNET_DBG(ZMDNET_DEBUG_USR, "Printing mbuf chain %p.\n", (void *) m);
+  zmdnet_debug(ZMDNET_DEBUG_USR, "Printing mbuf chain %p.\n", (void *) m);
   for (; m; m = m->m_next)
   {
-    ZMDNET_DBG(ZMDNET_DEBUG_USR, "%p: m_len = %ld, m_type = %x, m_next = %p.\n", (void *) m, m->m_len, m->m_type, (void *) m->m_next);
+    zmdnet_debug(ZMDNET_DEBUG_USR, "%p: m_len = %ld, m_type = %x, m_next = %p.\n", (void *) m, m->m_len, m->m_type, (void *) m->m_next);
     if (m->m_flags & M_EXT)
     {
-      ZMDNET_DBG(ZMDNET_DEBUG_USR, "%p: extend_size = %d, extend_buffer = %p, ref_cnt = %d.\n", (void *) m, m->m_ext.ext_size, (void *) m->m_ext.ext_buf, *(m->m_ext.ref_cnt));
+      zmdnet_debug(ZMDNET_DEBUG_USR, "%p: extend_size = %d, extend_buffer = %p, ref_cnt = %d.\n", (void *) m, m->m_ext.ext_size, (void *) m->m_ext.ext_buf, *(m->m_ext.ref_cnt));
     }
   }
 }

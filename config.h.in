@@ -31,6 +31,18 @@
 #cmakedefine ZMDNET_SUPPORT_IPV6
 #endif
 
+#ifndef ZMDNET_LTRACE_CHUNKS
+#cmakedefine ZMDNET_LTRACE_CHUNKS
+#endif
+
+#ifndef ZMDNET_LTRACE_ERRORS
+#cmakedefine ZMDNET_LTRACE_ERRORS
+#endif
+
+#ifndef ZMDNET_LOCAL_TRACE_BUF
+#cmakedefine ZMDNET_LOCAL_TRACE_BUF
+#endif
+
 #ifndef HAVE_SYS_QUEUE_H
 #cmakedefine HAVE_SYS_QUEUE_H
 #endif

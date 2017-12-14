@@ -29,6 +29,4 @@
 #ifndef __ZMDNET_UTIL_H__
 #define __ZMDNET_UTIL_H__
 
-extern void zmdnet_print_addr(struct sockaddr *);
-
 #endif
