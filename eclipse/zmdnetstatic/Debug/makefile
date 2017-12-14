@@ -10,12 +10,8 @@ RM := rm -rf
 -include sources.mk
 -include test/CMakeFiles/test-system-zmdnet-env.dir/subdir.mk
 -include test/subdir.mk
--include src/CMakeFiles/zmdnet.dir/system/subdir.mk
--include src/CMakeFiles/zmdnet.dir/distribution/auth/subdir.mk
--include src/CMakeFiles/zmdnet.dir/adaption/subdir.mk
--include src/CMakeFiles/zmdnet-static.dir/system/subdir.mk
--include src/CMakeFiles/zmdnet-static.dir/distribution/auth/subdir.mk
--include src/CMakeFiles/zmdnet-static.dir/adaption/subdir.mk
+-include src/CMakeFiles/zmdnet.dir/subdir.mk
+-include src/CMakeFiles/zmdnet-static.dir/subdir.mk
 -include src/subdir.mk
 -include sample/CMakeFiles/tzmdnet.dir/subdir.mk
 -include sample/subdir.mk

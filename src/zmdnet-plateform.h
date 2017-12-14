@@ -652,7 +652,7 @@ struct selinfo
 #define zmdnet_printf(...) if (g_base_info.debug_printf_func) { (g_base_info.debug_printf_func)(__VA_ARGS__); }
 
 #if defined(ZMDNET_DEBUG)
-#include <zmdnet-constant.h>
+#include "zmdnet-constant.h"
 #define zmdnet_debug_log(level, ...) {if (g_base_info_sysctl_var(zmdnet_debug_on) & level) {zmdnet_printf(__VA_ARGS__);}}
 #define zmdnet_debug_log_addr(level, addr) {if (g_base_info_sysctl_var(zmdnet_debug_on) & level ) { zmdnet_print_addr(addr);}}
 #else

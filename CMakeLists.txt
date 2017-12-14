@@ -48,6 +48,18 @@ include(CheckCCompilerFlag)
 
 option(RUN_TIME_CHECKS "Add runtime checks" 1)
 if (RUN_TIME_CHECKS)
+    message(STATUS "RUN_TIME_CHECKS")
+    add_definitions(-DRUN_TIME_CHECKS)
+endif ()
+
+option(RUN_TIME_CHECKS "Add runtime checks" 1)
+if (RUN_TIME_CHECKS)
+    message(STATUS "RUN_TIME_CHECKS")
+    add_definitions(-DRUN_TIME_CHECKS)
+endif ()
+
+option(RUN_TIME_CHECKS "Add runtime checks" 1)
+if (RUN_TIME_CHECKS)
 	message(STATUS "RUN_TIME_CHECKS")
 	add_definitions(-DRUN_TIME_CHECKS)
 endif ()
