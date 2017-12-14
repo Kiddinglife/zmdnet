@@ -74,6 +74,7 @@ src/config.h
 *.la
 *.a
 *.lib
+*.vcxproj
 
 # Executables
 *.exe
