@@ -593,23 +593,44 @@ struct selinfo
 #endif
 #endif
 
-// TODO sctp_os_userspace.h at line 592
-//#if defined(ZMDNET_LOCAL_TRACE_BUF)
-//#define ZMDNET_GET_CYCLECOUNT get_cyclecount()
-//#defineZMDNET_CTR6 sctp_log_trace
-//#else
-//#define ZMDNET_CTR6 CTR6
-//#endif
-/* Empty ktr statement for _Userspace__ (similar to what is done for mac) */
-//#define	CTR6(m, d, p1, p2, p3, p4, p5, p6)
-/* FIX ME: temp */
+/* FIXME: temp */
 #if !defined(DARWIN)
 #define USER_ADDR_NULL	(NULL)		
 #endif
 
-#include <malloc.h>
+/*
+ * Local address and interface list handling todo ?????????? what is vrf????
+ */
+#define SCTP_MAX_VRF_ID     0
+#define SCTP_SIZE_OF_VRF_HASH   3
+#define SCTP_IFNAMSIZ       IFNAMSIZ
+#define SCTP_DEFAULT_VRFID  0
+#define SCTP_VRF_ADDR_HASH_SIZE 16
+#define SCTP_VRF_IFN_HASH_SIZE  3
+#define SCTP_INIT_VRF_TABLEID(vrf)
 
+#ifdef _WIN32
+#define is_ift_loopback(ifn) (strncmp((ifn)->ifn_name, "lo", 2) == 0)
+#endif
+
+/*
+ * Access to IFN's to help with src-addr-selection
+ */
+/* This could return VOID if the index works but for BSD we provide both. */
+#define get_ifn_void_from_route(ro) (void *)ro->ro_rt->rt_ifp
+#define get_if_index_from_route(ro) 1 /* compiles...  TODO use routing socket to determine */
+#define route_has_valid_ifn(ro) ((ro)->ro_rt && (ro)->ro_rt->rt_ifp)
+
+#define zmdnet_malloc(mret,type,size)  mret = (type*) malloc(size);
 #define zmdnet_malloc_wait(mret,type,size)  do { mret = (type*) malloc(size);} while (!mret)
+#define zmdnet_malloc_wait_zero(mret,type,size)  mret = (type*) malloc(size); while (!mret) { mret = (type*) malloc(size);} memset(mret,0,size);
+#define malloc_soname(mret,type,size) zmdnet_malloc_wait_zero(mret,type,size)
+
+#define HASH_NOWAIT 0x00000001
+#define HASH_WAITOK 0x00000002
+void *hashinit_flags(int elements, u_long *hashmask, int flags);
+void hashdestroy(void *vhashtbl, u_long hashmask);
+void hashfreedestroy(void *vhashtbl, u_long hashmask);
 
 //IAMHERE   sctp_os_userspace.h line 462 #include "user_socketvar.h"
 
