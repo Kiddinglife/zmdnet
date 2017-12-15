@@ -421,4 +421,9 @@ extern struct mbstat mbstat; /* General mbuf stats/infos */
     (m)->m_data += (MHLEN - (len)) & ~(sizeof(long) - 1);       \
 } while (0)
 
+// SCTP_ALIGN_TO_END
+#define MBUFALIGN(m, len) \
+if(m->m_flags & M_PKTHDR) {MH_ALIGN(m, len);} \
+else if ((m->m_flags & M_EXT) == 0) {M_ALIGN(m, len);}
+
 #endif

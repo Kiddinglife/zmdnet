@@ -626,11 +626,69 @@ struct selinfo
 #define zmdnet_malloc_wait_zero(mret,type,size)  mret = (type*) malloc(size); while (!mret) { mret = (type*) malloc(size);} memset(mret,0,size);
 #define malloc_soname(mret,type,size) zmdnet_malloc_wait_zero(mret,type,size)
 
+// TODO
 #define HASH_NOWAIT 0x00000001
 #define HASH_WAITOK 0x00000002
 void *hashinit_flags(int elements, u_long *hashmask, int flags);
 void hashdestroy(void *vhashtbl, u_long hashmask);
 void hashfreedestroy(void *vhashtbl, u_long hashmask);
+
+// typedef struct callout timer_t which is used in the timer
+// related functions such as ZMDNET_TIMER_INIT
+// TODO move to timer.h
+#include "callout.h"
+
+// TODO move to multi-thread.h
+void recv_thread_init(void);
+void recv_thread_destroy(void);
+
+/*__Userspace__ defining KTR_SUBSYS 1 as done in os_macosx.h */
+#define KTR_SUBSYS 1
+
+/* The packed define for 64 bit platforms */
+#if !defined(_WIN32)
+#define ZMDNET_PACKED __attribute__((packed))
+#define ZMDNET_UNUSED __attribute__((unused))
+#else
+#define ZMDNET_PACKED
+#define ZMDNET_UNUSED
+#endif
+
+/* We make it so if you have up to 4 threads
+ * writting based on the default size of
+ * the packet log 65 k, that would be
+ * 4 16k packets before we would hit
+ * a problem.
+ * TODO move to multi-thread.h
+ */
+#define SCTP_PKTLOG_WRITERS_NEED_LOCK 3
+
+//todo
+typedef struct
+{
+} zmdnet_route;
+
+typedef struct
+{
+} zmdnet_rtentry;
+
+static inline void zmdnet_rtalloc(zmdnet_route *ro)
+{
+
+}
+static inline void zmdnet_rtfree(zmdnet_rtentry *rt)
+{
+
+}
+
+
+/*mtu*/
+extern int zmdnet_get_mtu_from_ifn(uint32_t if_index, int af);
+#define mtu_from_ifn_info(ifn, ifn_index, af) zmdnet_get_mtu_from_ifn(ifn_index, af)
+#define mtu_from_route(ifa, sa, rt) ((rt != NULL) ? rt->rt_rmx.rmx_mtu : 0)
+#define mtu_from_intfc(ifn) zmdnet_get_mtu_from_ifn(if_nametoindex(((struct ifaddrs *) (ifn))->ifa_name), AF_INET)
+#define set_mtu_route(sa, rt, mtu) if(rt != NULL) rt->rt_rmx.rmx_mtu = mtu;
+
 
 //IAMHERE   sctp_os_userspace.h line 462 #include "user_socketvar.h"
 
