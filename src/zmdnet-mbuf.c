@@ -295,7 +295,7 @@ static void mb_dtor_clust(void *mem, void *arg)
 /* Unlink and free a packet tag. */
 void m_tag_delete(struct mbuf *m, struct m_tag *t)
 {
-  ZMDNET_ASSERT(m && t,
+  zmdnet_assert(m && t,
       ("m_tag_delete: null argument, m %p t %p", (void *) m, (void *) t));
   m_tag_unlink(m, t);
   m_tag_free(t);
@@ -307,7 +307,7 @@ void m_tag_delete_chain(struct mbuf *m, struct m_tag *t)
 
   struct m_tag *p, *q;
 
-  ZMDNET_ASSERT(m, ("m_tag_delete_chain: null mbuf"));
+  zmdnet_assert(m, ("m_tag_delete_chain: null mbuf"));
   if (t != NULL)
     p = t;
   else
@@ -351,8 +351,8 @@ void mb_free_ext(struct mbuf *m)
 
   int skipmbuf;
 
-  ZMDNET_ASSERT((m->m_flags & M_EXT) == M_EXT, ("%s: M_EXT not set", __func__));
-  ZMDNET_ASSERT(m->m_ext.ref_cnt != NULL, ("%s: ref_cnt not set", __func__));
+  zmdnet_assert((m->m_flags & M_EXT) == M_EXT, ("%s: M_EXT not set", __func__));
+  zmdnet_assert(m->m_ext.ref_cnt != NULL, ("%s: ref_cnt not set", __func__));
 
   /*
    * check if the header is embedded in the cluster
@@ -526,7 +526,7 @@ m_pulldown(struct mbuf *m, int off, int len, int *offp)
   int writable;
 
   /* check invalid arguments. */
-  ZMDNET_ASSERT(m, ("m == NULL in m_pulldown()"));
+  zmdnet_assert(m, ("m == NULL in m_pulldown()"));
   if (len > MCLBYTES)
   {
     m_freem(m);
@@ -683,9 +683,9 @@ m_pulldown(struct mbuf *m, int off, int len, int *offp)
  */
 static void mb_dupcl(struct mbuf *n, struct mbuf *m)
 {
-  ZMDNET_ASSERT((m->m_flags & M_EXT) == M_EXT, ("%s: M_EXT not set", __func__));
-  ZMDNET_ASSERT(m->m_ext.ref_cnt != NULL, ("%s: ref_cnt not set", __func__));
-  ZMDNET_ASSERT((n->m_flags & M_EXT) == 0, ("%s: M_EXT set", __func__));
+  zmdnet_assert((m->m_flags & M_EXT) == M_EXT, ("%s: M_EXT not set", __func__));
+  zmdnet_assert(m->m_ext.ref_cnt != NULL, ("%s: ref_cnt not set", __func__));
+  zmdnet_assert((n->m_flags & M_EXT) == 0, ("%s: M_EXT set", __func__));
 
   if (*(m->m_ext.ref_cnt) == 1)
     *(m->m_ext.ref_cnt) += 1;
@@ -716,14 +716,14 @@ m_copym(struct mbuf *m, int off0, int len, int wait)
   struct mbuf *top;
   int copyhdr = 0;
 
-  ZMDNET_ASSERT(off >= 0, ("m_copym, negative off %d", off));
-  ZMDNET_ASSERT(len >= 0, ("m_copym, negative len %d", len));
+  zmdnet_assert(off >= 0, ("m_copym, negative off %d", off));
+  zmdnet_assert(len >= 0, ("m_copym, negative len %d", len));
 
   if (off == 0 && (m->m_flags & M_PKTHDR))
     copyhdr = 1;
   while (off > 0)
   {
-    ZMDNET_ASSERT(m != NULL, ("m_copym, offset > size of mbuf chain"));
+    zmdnet_assert(m != NULL, ("m_copym, offset > size of mbuf chain"));
     if (off < m->m_len)
       break;
     off -= m->m_len;
@@ -735,7 +735,7 @@ m_copym(struct mbuf *m, int off0, int len, int wait)
   {
     if (m == NULL)
     {
-      ZMDNET_ASSERT(len == M_COPYALL, ("m_copym, length > size of mbuf chain"));
+      zmdnet_assert(len == M_COPYALL, ("m_copym, length > size of mbuf chain"));
       break;
     }
     if (copyhdr)
@@ -782,7 +782,7 @@ int m_tag_copy_chain(struct mbuf *to, struct mbuf *from)
 {
   struct m_tag *p, *t, *tprev = NULL;
 
-  ZMDNET_ASSERT(to && from,
+  zmdnet_assert(to && from,
       ("m_tag_copy_chain: null argument, to %p from %p", (void *) to, (void *) from));
   m_tag_delete_chain(to, NULL);
   SLIST_FOREACH(p, &from->m_pkthdr.tags, m_tag_link)
@@ -810,8 +810,8 @@ int m_tag_copy_chain(struct mbuf *to, struct mbuf *from)
 int m_dup_pkthdr(struct mbuf *to, struct mbuf *from)
 {
 
-  ZMDNET_ASSERT(to, ("m_dup_pkthdr: to is NULL"));
-  ZMDNET_ASSERT(from, ("m_dup_pkthdr: from is NULL"));
+  zmdnet_assert(to, ("m_dup_pkthdr: to is NULL"));
+  zmdnet_assert(from, ("m_dup_pkthdr: from is NULL"));
   to->m_flags = (from->m_flags & M_COPYFLAGS) | (to->m_flags & M_EXT);
   if ((to->m_flags & M_EXT) == 0)
     to->m_data = to->m_pktdat;
@@ -826,7 +826,7 @@ m_tag_copy(struct m_tag *t)
 {
   struct m_tag *p;
 
-  ZMDNET_ASSERT(t, ("m_tag_copy: null tag"));
+  zmdnet_assert(t, ("m_tag_copy: null tag"));
   p = m_tag_alloc(t->m_tag_cookie, t->m_tag_id, t->m_tag_len);
   if (p == NULL)
     return (NULL);
@@ -954,11 +954,11 @@ void m_copydata(const struct mbuf *m, int off, int len, caddr_t cp)
 {
   u_int count;
 
-  ZMDNET_ASSERT(off >= 0, ("m_copydata, negative off %d", off));
-  ZMDNET_ASSERT(len >= 0, ("m_copydata, negative len %d", len));
+  zmdnet_assert(off >= 0, ("m_copydata, negative off %d", off));
+  zmdnet_assert(len >= 0, ("m_copydata, negative len %d", len));
   while (off > 0)
   {
-    ZMDNET_ASSERT(m != NULL, ("m_copydata, offset > size of mbuf chain"));
+    zmdnet_assert(m != NULL, ("m_copydata, offset > size of mbuf chain"));
     if (off < m->m_len)
       break;
     off -= m->m_len;
@@ -966,7 +966,7 @@ void m_copydata(const struct mbuf *m, int off, int len, caddr_t cp)
   }
   while (len > 0)
   {
-    ZMDNET_ASSERT(m != NULL, ("m_copydata, length > size of mbuf chain"));
+    zmdnet_assert(m != NULL, ("m_copydata, length > size of mbuf chain"));
     count = min(m->m_len - off, len);
     memcpy(cp, mtod(m, caddr_t) + off, count);
     len -= count;

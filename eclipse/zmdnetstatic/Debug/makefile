@@ -8,8 +8,12 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
+-include test/CMakeFiles/test-system-zmdnet-env.dir/subdir.mk
 -include test/subdir.mk
+-include src/CMakeFiles/zmdnet.dir/subdir.mk
+-include src/CMakeFiles/zmdnet-static.dir/subdir.mk
 -include src/subdir.mk
+-include sample/CMakeFiles/tzmdnet.dir/subdir.mk
 -include sample/subdir.mk
 -include subdir.mk
 -include objects.mk

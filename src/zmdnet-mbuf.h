@@ -402,9 +402,9 @@ extern struct mbstat mbstat; /* General mbuf stats/infos */
  * object of the specified size at the end of the mbuf, longword aligned.
  */
 #define M_ALIGN(m, len) do {                        \
-        ZMDNET_ASSERT(!((m)->m_flags & (M_PKTHDR|M_EXT)),                     \
+        zmdnet_assert(!((m)->m_flags & (M_PKTHDR|M_EXT)),                     \
                 ("%s: M_ALIGN not normal mbuf", __func__));             \
-        ZMDNET_ASSERT((m)->m_data == (m)->m_dat,                              \
+        zmdnet_assert((m)->m_data == (m)->m_dat,                              \
                 ("%s: M_ALIGN not a virgin mbuf", __func__));           \
     (m)->m_data += (MLEN - (len)) & ~(sizeof(long) - 1);        \
 } while (0)
@@ -414,9 +414,9 @@ extern struct mbstat mbstat; /* General mbuf stats/infos */
  * M_DUP/MOVE_PKTHDR.
  */
 #define MH_ALIGN(m, len) do {                       \
-        ZMDNET_ASSERT((m)->m_flags & M_PKTHDR && !((m)->m_flags & M_EXT),     \
+        zmdnet_assert((m)->m_flags & M_PKTHDR && !((m)->m_flags & M_EXT),     \
                 ("%s: MH_ALIGN not PKTHDR mbuf", __func__));            \
-        ZMDNET_ASSERT((m)->m_data == (m)->m_pktdat,                           \
+        zmdnet_assert((m)->m_data == (m)->m_pktdat,                           \
                 ("%s: MH_ALIGN not a virgin mbuf", __func__));          \
     (m)->m_data += (MHLEN - (len)) & ~(sizeof(long) - 1);       \
 } while (0)

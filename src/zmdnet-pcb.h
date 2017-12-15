@@ -29,20 +29,23 @@
 #define __ZMDNET_PCB_H__
 
 #include "zmdnet-constant.h"
+#include "zmdnet-sysctl.h"
 
-#if defined(__FreeBSD__) && __FreeBSD_version >= 801000
-VNET_DECLARE(struct zmdnet_base_info, g_base_info) ;
-#else
-extern struct zmdnet_base_info g_base_info;
-#endif
 
 /* All static structures that
  * anchor the system must be here.
  */
-struct zmdnet_base_info
+struct base_info_t
 {
+    struct sysctl_t sysctl;
     void (*debug_printf_func)(const char *format, ...);
 };
+
+#if defined(__FreeBSD__) && __FreeBSD_version >= 801000
+VNET_DECLARE(struct base_info_t, g_base_info) ;
+#else
+extern struct base_info_t g_base_info;
+#endif
 
 /*-
  * Here we have all the relevant information for each SCTP entity created. We

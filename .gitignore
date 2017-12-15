@@ -1,5 +1,8 @@
 # Prerequisites
 *.d
+*.so.*
+tzmdnet
+test-system-zmdnet-env
 
 # Compiled Object files
 *.slo
@@ -126,6 +129,16 @@ msvc/.vs
 *.opendb
 geco-engine.VC.db
 *.idb
+/Debug/
+/Debug/
+/Debug/
+/Debug/
+/Debug/
+/Debug/
+/Debug/
+/Debug/
+/Debug/
+/Debug/
 /Debug/
 /Debug/
 /Debug/
