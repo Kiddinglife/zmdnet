@@ -89,11 +89,26 @@ if(g_base_info_sysctl_var(logging_level) & ZMDNET_LTRACE_CHUNK_ENABLE) zmdnet_lo
     if (g_base_info_sysctl_var(logging_level) & ZMDNET_LTRACE_ERR_ENABLE) \
         zmdnet_printf("mbuf:%p inp:%p stcb:%p net:%p file:%x line:%d error:%d\n",  (void *)m, (void *)inp, (void *)stcb, (void *)net, file, __LINE__, err);
 #define zmdnet_ltrace_err_ret(inp, stcb, net, file, err) \
-    if (sctp_logging_level & SCTP_LTRACE_ERROR_ENABLE) \
+    if (logging_level & ZMDNET_LTRACE_ERROR_ENABLE) \
         zmdnet_printf("inp:%p stcb:%p net:%p file:%x line:%d error:%d\n",  (void *)inp, (void *)stcb, (void *)net, file, __LINE__, err);
 #else
 #define zmdnet_ltrace_err_ret_pkt(m, inp, stcb, net, file, err)
 #define zmdnet_ltrace_err_ret(inp, stcb, net, file, err)
 #endif
+
+#define iamhere() zmdnet_printf("%s:%d at %s\n", __FILE__, __LINE__ , __func__)
+
+/* For BSD this just accesses the M_PKTHDR length so it operates on an mbuf with hdr flag. 
+ * Other O/S's may have seperate packet header and mbuf chain pointers.. thus we need macros.
+*/
+#define mbuf_header_to_chain(m) (m)
+#define mbuf_detach_header_from_chain(m)
+#define mbuf_header_len(m) ((m)->m_pkthdr.len)
+#define mbuf_get_header_for_output(o_pak) 0
+#define mbuf_release_header(m)
+#define mbuf_release_pkt(m)	mbuf_m_freem(m)
+#define mbuf_get_pkt_vrfid(m, vrf_id)  ((vrf_id = SCTP_DEFAULT_VRFID) != SCTP_DEFAULT_VRFID)
+/* Attach the chain of data into the sendable packet. */
+#define mbuf_attach_chain(pak, m, packet_length) pak = m; pak->m_pkthdr.len = packet_length; 
 
 #endif

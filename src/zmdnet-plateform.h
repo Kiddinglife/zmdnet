@@ -290,24 +290,6 @@ typedef char* caddr_t;
 #define CMSG_LEN(x) WSA_CMSG_LEN(x)
 #endif
 
-/****  from sctp_os_windows.h ***************/
-#define ZMDNET_IFN_IS_IFT_LOOP(ifn)   ((ifn)->ifn_type == IFT_LOOP)
-#define ZMDNET_ROUTE_IS_REAL_LOOP(ro) \
-((ro)->ro_rt && (ro)->ro_rt->rt_ifa && (ro)->ro_rt->rt_ifa->ifa_ifp && \
-(ro)->ro_rt->rt_ifa->ifa_ifp->if_type == IFT_LOOP)
-
-/*
- * Access to IFN's to help with src-addr-selection
- */
-/* This could return VOID if the index works but for BSD we provide both. */
-#define ZMDNET_GET_IFN_VOID_FROM_ROUTE(ro) \
-    ((ro)->ro_rt != NULL ? (ro)->ro_rt->rt_ifp : NULL)
-#define ZMDNET_ROUTE_HAS_VALID_IFN(ro) \
-    ((ro)->ro_rt && (ro)->ro_rt->rt_ifp)
-/******************************************/
-
-#define ZMDNET_GET_IF_INDEX_FROM_ROUTE(ro) 1 /* compiles...  TODO use routing socket to determine */
-
 #define BIG_ENDIAN 1
 #define LITTLE_ENDIAN 0
 #ifdef WORDS_BIGENDIAN
@@ -609,6 +591,24 @@ struct selinfo
 #define SCTP_VRF_IFN_HASH_SIZE  3
 #define SCTP_INIT_VRF_TABLEID(vrf)
 
+ /****  from sctp_os_windows.h ***************/
+#define ZMDNET_IFN_IS_IFT_LOOP(ifn)   ((ifn)->ifn_type == IFT_LOOP)
+#define ZMDNET_ROUTE_IS_REAL_LOOP(ro) \
+((ro)->ro_rt && (ro)->ro_rt->rt_ifa && (ro)->ro_rt->rt_ifa->ifa_ifp && \
+(ro)->ro_rt->rt_ifa->ifa_ifp->if_type == IFT_LOOP)
+
+ /*
+ * Access to IFN's to help with src-addr-selection
+ */
+ /* This could return VOID if the index works but for BSD we provide both. */
+#define ZMDNET_GET_IFN_VOID_FROM_ROUTE(ro) \
+    ((ro)->ro_rt != NULL ? (ro)->ro_rt->rt_ifp : NULL)
+#define ZMDNET_ROUTE_HAS_VALID_IFN(ro) \
+    ((ro)->ro_rt && (ro)->ro_rt->rt_ifp)
+ /******************************************/
+
+#define ZMDNET_GET_IF_INDEX_FROM_ROUTE(ro) 1 /* compiles...  TODO use routing socket to determine */
+// use geconet typeofaddr() this is not cjeck sitelock and linklocal for ipv6
 #ifdef _WIN32
 #define is_ift_loopback(ifn) (strncmp((ifn)->ifn_name, "lo", 2) == 0)
 #endif
@@ -635,12 +635,8 @@ void hashfreedestroy(void *vhashtbl, u_long hashmask);
 
 // typedef struct callout timer_t which is used in the timer
 // related functions such as ZMDNET_TIMER_INIT
-// TODO move to timer.h
+// todo port to userspace at line 799
 #include "callout.h"
-
-// TODO move to multi-thread.h
-void recv_thread_init(void);
-void recv_thread_destroy(void);
 
 /*__Userspace__ defining KTR_SUBSYS 1 as done in os_macosx.h */
 #define KTR_SUBSYS 1
@@ -664,23 +660,24 @@ void recv_thread_destroy(void);
 #define SCTP_PKTLOG_WRITERS_NEED_LOCK 3
 
 //todo
-typedef struct
+struct zmdnet_route
 {
-} zmdnet_route;
+    int dummy;
+};
 
-typedef struct
+struct zmdnet_rtentry
 {
-} zmdnet_rtentry;
+    int dummy;
+};
 
-static inline void zmdnet_rtalloc(zmdnet_route *ro)
-{
-
-}
-static inline void zmdnet_rtfree(zmdnet_rtentry *rt)
+static inline void zmdnet_rtalloc(struct zmdnet_route* route)
 {
 
 }
+static inline void zmdnet_rtfree(struct zmdnet_rtentry* rtentry)
+{
 
+}
 
 /*mtu*/
 extern int zmdnet_get_mtu_from_ifn(uint32_t if_index, int af);
@@ -689,8 +686,55 @@ extern int zmdnet_get_mtu_from_ifn(uint32_t if_index, int af);
 #define mtu_from_intfc(ifn) zmdnet_get_mtu_from_ifn(if_nametoindex(((struct ifaddrs *) (ifn))->ifa_name), AF_INET)
 #define set_mtu_route(sa, rt, mtu) if(rt != NULL) rt->rt_rmx.rmx_mtu = mtu;
 
+// TODO
+// call get_inf() and then compare if it is braodcast addr
+//#define is_broadcast_addr(dst, m) 0
+inline unsigned char is_broadcast_addr(struct sockaddr* sa)
+{
+    return 1;
+}
 
-//IAMHERE   sctp_os_userspace.h line 462 #include "user_socketvar.h"
+// v6 hop limit 
+#define GET_HLIM(inp, ro) 128 /* As done for __Windows__ */
+#define IPV6_HOP_LIMIT 128
+
+// is the endpoint v6only? 
+#define ipv6only(inp)	(((struct inpcb *)inp)->inp_flags & IN6P_IPV6_V6ONLY)
+
+// is the socket non-blocking? 
+#define is_so_nbio(so)	((so)->so_state & SS_NBIO)
+#define set_sonbio(so)	((so)->so_state |= SS_NBIO)
+#define clear_so_nbio(so)	((so)->so_state &= ~SS_NBIO)
+#define get_so_type(so)	((so)->so_type)
+// reserve sb space for a socket 
+#define so_reserve(so, send, recv)	soreserve(so, send, recv)
+// wakeup a socket 
+#define wakeup_so(so)	wakeup(&(so)->so_timeo, so)
+// clear the socket buffer state 
+#define clear_so_buf(sb)	 (sb).sb_cc = 0;(sb).sb_mb = NULL;(sb).sb_mbcnt = 0;
+#define get_so_recv_hiwat(so) so->so_rcv.sb_hiwat
+#define get_so_snd_hiwat(so) so->so_snd.sb_hiwat
+// TODO read_random
+#define readrand(buf, len) read_random(buf, len)
+
+/* start OOTB only stuff */
+//An out - of - the - box feature or functionality(also called OOTB or off the shelf), particularly in software, 
+//is a feature or functionality of a product that works immediately after installation without anyconfiguration 
+//or modification.[1][2] It also means that it is available for all users by default, and are not required to pay 
+//additionally to use those features, or needs to be configured
+/* TODO IFT_LOOP is in net/if_types.h on Linux */
+/* fixme not used*/
+#define IFT_LOOP 0x18
+#if defined(_WIN32)
+#define SHUT_RD 1
+#define SHUT_WR 2
+#define SHUT_RDWR 3
+#endif
+#define PRU_FLUSH_RD SHUT_RD
+#define PRU_FLUSH_WR SHUT_WR
+#define PRU_FLUSH_RDWR SHUT_RDWR
+#define	IP_RAWOUTPUT		0x2
+/* end OOTB only stuff */
 
 #define AF_CONN 123
 struct sockaddr_conn
@@ -704,5 +748,79 @@ struct sockaddr_conn
   uint16_t sconn_port;
   void *sconn_addr;
 };
+
+#define	M_NOTIFICATION		M_PROTO5	/* zmdnet protocol  specific mbuf flags. */
+
+/* Defining ZMDNET_IP_ID macro.
+In netinet/ip_output.c, we have u_short ip_id;
+In netinet/ip_var.h, we have extern u_short	ip_id; (enclosed within _KERNEL_)
+See static __inline uint16_t ip_newid(void) in netinet/ip_var.h
+*/
+#define ZMDNET_IP_ID(inp) (ip_id)
+
+/* need sctphdr to get port in ZMDNET_IP_OUTPUT. sctphdr defined in zmdnet.h  */
+#include "zmdnet.h"
+#include "ipv6_var.h"
+extern void userspace_ipv4_output(int *result, struct mbuf *o_pak, struct zmdnet_route *ro, void *stcb, uint32_t vrf_id);
+#if defined(ZMDNET_SUPPORT_IPV6)
+extern void userspace_ipv6_output(int *result, struct mbuf *o_pak, struct route_in6 *ro, void *stcb, uint32_t vrf_id);
+#endif
+
+struct mbuf*  get_mbuf_for_msg(unsigned int space_needed, int want_header, int how, int all_in_one_buf, int type);
+
+/* with the current included files, CMSG_ALIGN is defined in Linux but in FreeBSD, it is behind a _KERNEL in sys/socket.h ...*/
+#if defined(__DragonFly__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__native_client__)
+/* stolen from /usr/include/sys/socket.h */
+#define CMSG_ALIGN(n)   _ALIGN(n)
+#elif defined(__NetBSD__)
+#define CMSG_ALIGN(n)   (((n) + __ALIGNBYTES) & ~__ALIGNBYTES)
+#elif defined(DARWIN)
+#if !defined(__DARWIN_ALIGNBYTES)
+#define	__DARWIN_ALIGNBYTES	(sizeof(__darwin_size_t) - 1)
+#endif
+#if !defined(__DARWIN_ALIGN)
+#define	__DARWIN_ALIGN(p)	((__darwin_size_t)((char *)(uintptr_t)(p) + __DARWIN_ALIGNBYTES) &~ __DARWIN_ALIGNBYTES)
+#endif
+#if !defined(__DARWIN_ALIGNBYTES32)
+#define __DARWIN_ALIGNBYTES32     (sizeof(__uint32_t) - 1)
+#endif
+#if !defined(__DARWIN_ALIGN32)
+#define __DARWIN_ALIGN32(p)       ((__darwin_size_t)((char *)(uintptr_t)(p) + __DARWIN_ALIGNBYTES32) &~ __DARWIN_ALIGNBYTES32)
+#endif
+#define CMSG_ALIGN(n)   __DARWIN_ALIGN32(n)
+#endif
+
+#if defined(__linux__)
+#if !defined(TAILQ_FOREACH_SAFE)
+#define TAILQ_FOREACH_SAFE(var, head, field, tvar)  \
+for ((var) = ((head)->tqh_first); (var) && ((tvar) = TAILQ_NEXT((var), field), 1);  (var) = (tvar))
+#endif
+#if !defined(LIST_FOREACH_SAFE)
+#define LIST_FOREACH_SAFE(var, head, field, tvar)  \
+ for ((var) = ((head)->lh_first); (var) && ((tvar) = LIST_NEXT((var), field), 1); (var) = (tvar))
+#endif
+#endif
+
+#if defined(__DragonFly__)
+#define TAILQ_FOREACH_SAFE TAILQ_FOREACH_MUTABLE
+#define LIST_FOREACH_SAFE LIST_FOREACH_MUTABLE
+#endif
+
+#ifndef timevalsub
+#define timevalsub(tp1, tp2)                       \
+		(tp1)->tv_sec -= (tp2)->tv_sec;    \
+		(tp1)->tv_usec -= (tp2)->tv_usec;  \
+		if ((tp1)->tv_usec < 0) {          \
+			(tp1)->tv_sec--;           \
+			(tp1)->tv_usec += 1000000; \
+		} 
+#endif
+
+#if defined(__native_client__)
+#define timercmp(tvp, uvp, cmp) \
+(((tvp)->tv_sec == (uvp)->tv_sec) ?	 ((tvp)->tv_usec cmp (uvp)->tv_usec) : ((tvp)->tv_sec cmp (uvp)->tv_sec))
+#endif
+
+#define zmdnet_is_listening(inp) ((inp->sctp_flags & ZMDNET_PCB_FLAGS_ACCEPTING) != 0)
 
 #endif /* SRC_SYSTEM_ZMDNET_OS_USER_SPACE_H_ */

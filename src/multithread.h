@@ -25,14 +25,14 @@
 * SUCH DAMAGE.
 */
 
-#ifndef __ZMDNET_H__
-#define __ZMDNET_H__
-#ifdef  __cplusplus
-extern "C"
-{
-#endif
-    //todo
-#ifdef  __cplusplus
-}
-#endif
+#ifndef __ZMDNET_MULTI_THREAD_H__
+#define __ZMDNET_MULTI_THREAD_H__
+
+void recv_thread_init(void);
+void recv_thread_destroy(void);
+
+typedef void *(*start_routine_t)(void *);
+extern int thread_create(userland_thread_t *thread, start_routine_t start_routine);
+extern void set_threadname(const char *name);
+
 #endif
