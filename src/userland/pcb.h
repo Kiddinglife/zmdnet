@@ -28,8 +28,8 @@
 #ifndef __ZMDNET_PCB_H__
 #define __ZMDNET_PCB_H__
 
-#include "zmdnet-constant.h"
-#include "zmdnet-sysctl.h"
+#include "../protocolstack/constant.h"
+#include "sysctl.h"
 
 
 /* All static structures that

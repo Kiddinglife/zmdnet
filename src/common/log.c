@@ -1,5 +1,5 @@
-#include "mlog.h"
-#include "zmdnet-plateform.h"
+#include "../common/log.h"
+#include "../userland/userland.h"
 
 #if defined(ZMDNET_LOCAL_TRACE_BUF) || defined(__APPLE__)
 void zmdnet_log_trace(uint32_t fr, const char *str, uint32_t a, uint32_t b,

@@ -469,8 +469,8 @@ struct selinfo
 #include <stdio.h>
 #include <string.h>
 
-#include "zmdnet-socket-var.h"
-#include "zmdnet-atomic.h"
+#include "../userland/sockvar.h"
+#include "../common/atomic.h"
 
 #if defined(__FreeBSD__) && __FreeBSD_version > 602000
 #include <sys/rwlock.h>
@@ -499,7 +499,7 @@ struct selinfo
 #if defined(HAVE_NETINET_IP_ICMP_H)
 #include <netinet/ip_icmp.h>
 #else
-#include "zmdnet-icmp.h"
+#include "../userland/icmp.h"
 #endif
 
 // #include "zmdnet-inpcb.h" // TODO
@@ -545,18 +545,20 @@ struct selinfo
 #include <netinet6/ip6_var.h>
 #endif
 
+#include "pcb.h"
+
+#ifdef HAVE_SYS_QUEUE_H
+#include <sys/queue.h>
+#else
+#include "../common/queue.h"
+#endif
+
 #if defined(__FreeBSD__)
 #include <netinet6/in6_pcb.h>
 #include <netinet6/ip6protosw.h>
 #include <netinet6/scope6_var.h>
 #endif
 #endif /* INET6 */
-
-#ifdef HAVE_SYS_QUEUE_H
-#include <sys/queue.h>
-#else
-#include "zmdnet-queue.h"
-#endif
 
 #if defined(HAVE_PEELOFF_SOCKOPT)
 #include <sys/file.h>
@@ -636,7 +638,7 @@ void hashfreedestroy(void *vhashtbl, u_long hashmask);
 // typedef struct callout timer_t which is used in the timer
 // related functions such as ZMDNET_TIMER_INIT
 // todo port to userspace at line 799
-#include "callout.h"
+#include "../common/callout.h"
 
 /*__Userspace__ defining KTR_SUBSYS 1 as done in os_macosx.h */
 #define KTR_SUBSYS 1

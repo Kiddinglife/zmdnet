@@ -137,19 +137,20 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 # )
 list(APPEND zmdnet_headers
 	zmdnet.h
-	zmdnet-atomic.h
-	zmdnet-icmp.h
-    zmdnet-plateform.h
-    zmdnet-queue.h
-    zmdnet-mbuf.h
-	zmdnet-auth.h
-	zmdnet-socket.h
-	zmdnet-socket-var.h
-    zmdnet-constant.h  
-    zmdnet-pcb.h 
-    zmdnet-util.h
-    zmdnet-sysctl.h
-    mlog.h
+	common/atomic.h
+    common/callout.h
+	userland/icmp.h
+    userland/userland.h
+    common/queue.h
+    userland/mbuf.h
+	protocolstack/auth.h
+	userland/sock.h
+	userland/sockvar.h
+    protocolstack/constant.h  
+    userland/pcb.h 
+    common/util.h
+    userland/sysctl.h
+    common/log.h
 )
 
 # list(APPEND usrsctp_sources
@@ -178,13 +179,13 @@ list(APPEND zmdnet_headers
 # 	user_socket.c
 # )
 list(APPEND zmdnet_sources
-    zmdnet-mbuf.c
-	zmdnet-auth.c
-    zmdnet-plateform.c
-	zmdnet-socket.c
-    zmdnet-pcb.c
-    zmdnet-util.c
-    mlog.c
+    userland/mbuf.c
+	protocolstack/auth.c
+    userland/userland.c
+	userland/sock.c
+    userland/pcb.c
+    common/util.c
+    common/log.c
 )
 
 add_library(zmdnet SHARED ${zmdnet_sources} ${zmdnet_headers})

@@ -34,11 +34,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "zmdnet-mbuf.h"
-#include "zmdnet-atomic.h"
-#include "zmdnet-pcb.h"
-
-#include "mlog.h"
+#include "mbuf.h"
+#include "../common/atomic.h"
+#include "pcb.h"
+#include "../common/log.h"
 
 #define ZMDNET_ZONE_INIT(zone, name, size, number) {zone = size;}
 #define ZMDNET_ZONE_GET(zone, type)  (type *)malloc(zone)

@@ -28,9 +28,7 @@
 #ifndef __ZMDNET_MLOG_H__
 #define __ZMDNET_MLOG_H__
 
-#include "config.h"
-#include "zmdnet-plateform.h"
-#include "zmdnet-pcb.h"
+#include "../userland/userland.h"
 
 extern void zmdnet_print_addr(struct sockaddr *);
 
@@ -61,7 +59,7 @@ extern void zmdnet_log_trace(uint32_t fr, const char *str, uint32_t a, uint32_t 
 #define zmdnet_printf(...) if(g_base_info.debug_printf_func) g_base_info.debug_printf_func(__VA_ARGS__)
 
 #if defined(ZMDNET_DEBUG)
-#include "zmdnet-constant.h"
+#include "../protocolstack/constant.h"
 #define zmdnet_debug(level, ...) if (g_base_info_sysctl_var(is_debug_on) & level) {zmdnet_printf(__VA_ARGS__);}
 #define zmdnet_debug_addr(level, addr) if (g_base_info_sysctl_var(zmdnet_debug_on) & level ) { zmdnet_print_addr(addr);}
 #else
