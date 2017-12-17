@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>zmdnet</name>
+	<name>zmdnetstatic</name>
 	<comment></comment>
 	<projects>
 	</projects>
 	<buildSpec>
-		<buildCommand>
-			<name>org.python.pydev.PyDevBuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
 		<buildCommand>
 			<name>org.eclipse.cdt.managedbuilder.core.genmakebuilder</name>
 			<triggers>clean,full,incremental,</triggers>
@@ -27,19 +22,27 @@
 		<nature>org.eclipse.cdt.core.cnature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
-		<nature>org.eclipse.cdt.core.ccnature</nature>
-		<nature>org.python.pydev.pythonNature</nature>
 	</natures>
 	<linkedResources>
+		<link>
+			<name>.gitignore</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/.gitignore</locationURI>
+		</link>
 		<link>
 			<name>CMakeLists.txt</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/CMakeLists.txt</locationURI>
 		</link>
 		<link>
-			<name>SConstruct</name>
+			<name>config.h.in</name>
 			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/SConstruct</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/config.h.in</locationURI>
+		</link>
+		<link>
+			<name>docx</name>
+			<type>2</type>
+			<locationURI>PARENT-2-PROJECT_LOC/docx</locationURI>
 		</link>
 		<link>
 			<name>sample</name>

@@ -1,5 +1,8 @@
 # Prerequisites
 *.d
+*.so.*
+tzmdnet
+test-system-zmdnet-env
 
 # Compiled Object files
 *.slo
@@ -36,11 +39,16 @@
 /_builds
 /build
 /_build
-/CMakeFiles
 CMakeCache.txt
-CMakeList.txt
+CMakeFiles
+CMakeScripts
+Testing
 Makefile
 cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+src/config.h
 
 # Prerequisites
 *.d
@@ -69,11 +77,15 @@ cmake_install.cmake
 *.la
 *.a
 *.lib
+*.vcxproj
 
 # Executables
 *.exe
 *.out
 *.app
+
+.vs
+msvc/.vs
 
 # Compiled Object files
 *.slo
@@ -117,3 +129,16 @@ cmake_install.cmake
 *.opendb
 geco-engine.VC.db
 *.idb
+/Debug/
+/Debug/
+/Debug/
+/Debug/
+/Debug/
+/Debug/
+/Debug/
+/Debug/
+/Debug/
+/Debug/
+/Debug/
+/Debug/
+/Debug/

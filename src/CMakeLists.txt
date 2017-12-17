@@ -54,6 +54,7 @@ add_definitions(-DZMDNET_PROCESS_LEVEL_LOCKS)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	add_definitions(-D_GNU_SOURCE)
+	option(_GNU_SOURCE "_GNU_SOURCE" 1)
 endif ()
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
@@ -136,9 +137,21 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 # )
 list(APPEND zmdnet_headers
 	zmdnet.h
-	system/zmdnet-env.h
-	distribution/auth/zmdnet-auth.h
-	adaption/zmdnet-socket.h
+	common/atomic.h
+    common/multhrd.h
+    common/callout.h
+	userland/icmp.h
+    userland/userland.h
+    common/queue.h
+    userland/mbuf.h
+	protocolstack/auth.h
+	userland/sock.h
+	userland/sockvar.h
+    protocolstack/constant.h  
+    userland/pcb.h 
+    common/util.h
+    userland/sysctl.h
+    common/log.h
 )
 
 # list(APPEND usrsctp_sources
@@ -167,9 +180,13 @@ list(APPEND zmdnet_headers
 # 	user_socket.c
 # )
 list(APPEND zmdnet_sources
-	system/zmdnet-env.c
-	distribution/auth/zmdnet-auth.h
-	adaption/zmdnet-socket.c
+    userland/mbuf.c
+	protocolstack/auth.c
+    userland/userland.c
+	userland/sock.c
+    userland/pcb.c
+    common/util.c
+    common/log.c
 )
 
 add_library(zmdnet SHARED ${zmdnet_sources} ${zmdnet_headers})

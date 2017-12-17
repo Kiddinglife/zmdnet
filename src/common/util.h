@@ -1,3 +1,4 @@
+
 /*-
 * Copyright (c) 2015-2017 Mengdi Zhang
 *
@@ -25,14 +26,7 @@
 * SUCH DAMAGE.
 */
 
-#ifndef __ZMDNET_H__
-#define __ZMDNET_H__
-#ifdef  __cplusplus
-extern "C"
-{
-#endif
-    //todo
-#ifdef  __cplusplus
-}
-#endif
+#ifndef __ZMDNET_UTIL_H__
+#define __ZMDNET_UTIL_H__
+
 #endif

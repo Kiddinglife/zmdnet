@@ -22,36 +22,12 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
  */
 
-#include <sys/types.h>
-#include <stdlib.h>
-#include <string.h>
+#ifndef __ZMDNET_CALLOUT_H__
+#define __ZMDNET_CALLOUT_H__
 
-#if !defined (__WIN32__)
-#include <stdint.h>
-#include "zmdnet-user-space.h"
+
+
 #endif
-
-#include "zmdnet-env.h"
-
-/* #include <sys/param.h> defines MIN */
-#if !defined(MIN)
-#define MIN(arg1,arg2) ((arg1) < (arg2) ? (arg1) : (arg2))
-#endif
-
-#define uHZ 1000
-
-/* See zmdnet-env.h for comments about these variables */
-int maxsockets = 25600;
-int hz = uHZ;
-int ip_defttl = 64;
-int ipport_firstauto = 49152, ipport_lastauto = 65535;
-int nmbclusters = 65536;
-
-/* Source ip_output.c. extern'd in ip_var.h */
-u_short ip_id = 0; /*__Userspace__ TODO Should it be initialized to zero? */
-
-
-
-

@@ -25,14 +25,10 @@
 * SUCH DAMAGE.
 */
 
-#ifndef __ZMDNET_H__
-#define __ZMDNET_H__
-#ifdef  __cplusplus
-extern "C"
+#ifndef __ZMDNET_IPV6_VAR_H__
+#define __ZMDNET_IPV6_VAR_H__
+struct route_in6
 {
-#endif
-    //todo
-#ifdef  __cplusplus
-}
-#endif
+    int dummy;
+};
 #endif

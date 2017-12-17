@@ -1,0 +1,81 @@
+
+#ifndef _GNU_SOURCE
+#cmakedefine _GNU_SOURCE
+#endif
+
+#ifndef ZMDNET_DEBUG
+#cmakedefine ZMDNET_DEBUG
+#endif
+
+#ifndef RUN_TIME_CHECKS
+#cmakedefine RUN_TIME_CHECKS
+#endif
+
+#ifndef ZMDNET_SUPPORT_IPV4
+#cmakedefine ZMDNET_SUPPORT_IPV4
+#endif
+
+#ifndef HAVE_PEELOFF_SOCKOPT
+#cmakedefine have_peeloff_sockopt
+#endif
+
+#ifndef ZMDNET_PROCESS_LEVEL_LOCKS
+#cmakedefine ZMDNET_PROCESS_LEVEL_LOCKS
+#endif
+
+#ifndef HAVE_IPSEC
+#cmakedefine have_IPSEC
+#endif
+
+#ifndef ZMDNET_SUPPORT_IPV6
+#cmakedefine ZMDNET_SUPPORT_IPV6
+#endif
+
+#ifndef ZMDNET_LTRACE_CHUNKS
+#cmakedefine ZMDNET_LTRACE_CHUNKS
+#endif
+
+#ifndef ZMDNET_LTRACE_ERRORS
+#cmakedefine ZMDNET_LTRACE_ERRORS
+#endif
+
+#ifndef ZMDNET_LOCAL_TRACE_BUF
+#cmakedefine ZMDNET_LOCAL_TRACE_BUF
+#endif
+
+#ifndef HAVE_SYS_QUEUE_H
+#cmakedefine HAVE_SYS_QUEUE_H
+#endif
+
+#ifndef HAVE_LINUX_IF_ADDR_H
+#cmakedefine have_linux_if_addr_h
+#endif
+
+#ifndef HAVE_LINUX_RTNETLINK_H
+#cmakedefine HAVE_LINUX_RTNETLINK_H
+#endif
+
+#ifndef HAVE_NETINET_IP_ICMP_H
+#cmakedefine HAVE_NETINET_IP_ICMP_H
+#endif
+
+#ifndef HAVE_STDATOMIC_H
+#cmakedefine HAVE_STDATOMIC_H
+#endif
+
+#ifndef HAVE_SA_LEN
+#cmakedefine HAVE_SA_LEN
+#endif
+
+#ifndef HAVE_SIN_LEN
+#cmakedefine HAVE_SIN_LEN
+#endif
+
+#ifndef HAVE_SIN6_LEN
+#cmakedefine HAVE_SIN6_LEN
+#endif
+
+#ifndef HAVE_SCONN_LEN
+#cmakedefine HAVE_SCONN_LEN
+#endif
+
