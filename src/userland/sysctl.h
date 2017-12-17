@@ -33,7 +33,7 @@
 struct sysctl_t
 {
 #if defined(ZMDNET_DEBUG)
-    unsigned char is_debug_on;
+    unsigned int allowed_debug_levels;
 #endif
 };
 

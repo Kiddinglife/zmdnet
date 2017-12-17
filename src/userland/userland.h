@@ -33,6 +33,7 @@
 #include <errno.h>
 #include <stdint.h>
 #include <sys/types.h>
+#include "../common/log.h"
 
 #ifdef __FreeBSD__
 #ifndef _SYS_MUTEX_H_
@@ -64,7 +65,7 @@ extern int ipport_firstauto, ipport_lastauto;
  *  this is 1024 + maxusers * 64.
  */
 extern int nmbclusters;
-extern int read_random(void *buf, int count);
+extern int read_random(void *buf, int count); //todo puthLib into init function like zmdnet_init()
 extern int ip_id;
 /* necessary for zmdnet_pcb.c */
 extern int ip_defttl;
@@ -183,13 +184,7 @@ typedef HANDLE zmdnet_thread_t;
 #define EAFNOSUPPORT            WSAEAFNOSUPPORT
 #endif
 #ifndef EADDRINUSE
-#define EADDRINUSE            /* __Userspace__ version of sys/i386/include/atomic.h goes here */
-
-/* TODO In the future, might want to not use i386 specific assembly.
- *    The options include:
- *       - implement them generically (but maybe not truly atomic?) in userspace
- *       - have ifdef's for __Userspace_arch_ perhaps (OS isn't enough...)
- */WSAEADDRINUSE
+#define EADDRINUSE   WSAEADDRINUSE         
 #endif
 #ifndef EADDRNOTAVAIL
 #define EADDRNOTAVAIL           WSAEADDRNOTAVAIL
@@ -623,17 +618,14 @@ struct selinfo
 #define get_if_index_from_route(ro) 1 /* compiles...  TODO use routing socket to determine */
 #define route_has_valid_ifn(ro) ((ro)->ro_rt && (ro)->ro_rt->rt_ifp)
 
-#define zmdnet_malloc(mret,type,size)  mret = (type*) malloc(size);
-#define zmdnet_malloc_wait(mret,type,size)  do { mret = (type*) malloc(size);} while (!mret)
-#define zmdnet_malloc_wait_zero(mret,type,size)  mret = (type*) malloc(size); while (!mret) { mret = (type*) malloc(size);} memset(mret,0,size);
-#define malloc_soname(mret,type,size) zmdnet_malloc_wait_zero(mret,type,size)
+#define zmdnet_malloc(mret,type,size)  do { mret = (type*) malloc(size);} while (!mret)
+#define zmdnet_malloc_zero(mret,type,size)  mret = (type*) malloc(size); while (!mret) { mret = (type*) malloc(size);} memset(mret,0,size);
+#define malloc_soname(mret,type,size) zmdnet_malloc_zero(mret,type,size)
+#define zmdnet_free(ptr) free(ptr)
 
-// TODO
-#define HASH_NOWAIT 0x00000001
-#define HASH_WAITOK 0x00000002
-void *hashinit_flags(int elements, u_long *hashmask, int flags);
-void hashdestroy(void *vhashtbl, u_long hashmask);
-void hashfreedestroy(void *vhashtbl, u_long hashmask);
+void* hash_init(int elements, u_long *hashmask);
+void hash_destroy(void *vhashtbl, u_long hashmask);
+
 
 // typedef struct callout timer_t which is used in the timer
 // related functions such as ZMDNET_TIMER_INIT
@@ -651,15 +643,6 @@ void hashfreedestroy(void *vhashtbl, u_long hashmask);
 #define ZMDNET_PACKED
 #define ZMDNET_UNUSED
 #endif
-
-/* We make it so if you have up to 4 threads
- * writting based on the default size of
- * the packet log 65 k, that would be
- * 4 16k packets before we would hit
- * a problem.
- * TODO move to multi-thread.h
- */
-#define SCTP_PKTLOG_WRITERS_NEED_LOCK 3
 
 //todo
 struct zmdnet_route

@@ -37,9 +37,9 @@ extern void zmdnet_log_trace(uint32_t fr, const char *str, uint32_t a, uint32_t 
     uint32_t c, uint32_t d, uint32_t e, uint32_t f);
 #endif
 
-#ifdef RUN_TIME_CHECKS
-#include <stdlib.h>
 #define panic(...) zmdnet_printf("%s(): ", __func__);zmdnet_printf(__VA_ARGS__);zmdnet_printf("\n");abort()
+#if defined(RUN_TIME_CHECKS) || defined(ZMDNET_DEBUG)
+#include <stdlib.h>
 #define zmdnet_assert(cond,args) if (!(cond)) panic args
 #else
 #define zmdnet_assert(cond, args)
@@ -60,8 +60,8 @@ extern void zmdnet_log_trace(uint32_t fr, const char *str, uint32_t a, uint32_t 
 
 #if defined(ZMDNET_DEBUG)
 #include "../protocolstack/constant.h"
-#define zmdnet_debug(level, ...) if (g_base_info_sysctl_var(is_debug_on) & level) {zmdnet_printf(__VA_ARGS__);}
-#define zmdnet_debug_addr(level, addr) if (g_base_info_sysctl_var(zmdnet_debug_on) & level ) { zmdnet_print_addr(addr);}
+#define zmdnet_debug(level, ...) if ((g_base_info_sysctl_var(allowed_debug_levels)) & level) {zmdnet_printf(__VA_ARGS__);}
+#define zmdnet_debug_addr(level, addr) if (g_base_info_sysctl_var(allowed_debug_levels) & level ) { zmdnet_print_addr(addr);}
 #else
 #define zmdnet_debug(level, ...)
 #define zmdnet_debug_addr(level, addr)

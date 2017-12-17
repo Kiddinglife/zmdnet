@@ -138,6 +138,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 list(APPEND zmdnet_headers
 	zmdnet.h
 	common/atomic.h
+    common/multhrd.h
     common/callout.h
 	userland/icmp.h
     userland/userland.h

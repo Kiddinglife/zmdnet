@@ -81,7 +81,7 @@ struct mbuf* m_get(short type)
   mbuf_mb_args.flags = 0;
   mbuf_mb_args.type = type;
   // zone_mbuf has already been created in mbuf_initialize()
-  zmdnet_malloc_wait(mret, struct mbuf, zone_mbuf);
+  zmdnet_malloc(mret, struct mbuf, zone_mbuf);
   mb_ctor_mbuf(mret, &mbuf_mb_args, 0);
   return mret;
 }
@@ -92,7 +92,7 @@ struct mbuf* m_gethdr(short type)
   struct mb_args mbuf_mb_args;
   mbuf_mb_args.flags = M_PKTHDR;
   mbuf_mb_args.type = type;
-  zmdnet_malloc_wait(mret, struct mbuf, zone_mbuf);
+  zmdnet_malloc(mret, struct mbuf, zone_mbuf);
   mb_ctor_mbuf(mret, &mbuf_mb_args, 0);
   return mret;
 }
@@ -146,7 +146,7 @@ void m_clget(struct mbuf *m)
   }
   m->m_ext.ext_buf = (char *) NULL;
   clust_mb_args_l.parent_mbuf = m;
-  zmdnet_malloc_wait(mclust_ret, char, zone_clust);
+  zmdnet_malloc(mclust_ret, char, zone_clust);
   mb_ctor_clust(mclust_ret, &clust_mb_args_l, 0);
   if ((m->m_ext.ext_buf == NULL))
   {
