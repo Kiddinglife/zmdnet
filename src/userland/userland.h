@@ -497,7 +497,7 @@ struct selinfo
 #include "../userland/icmp.h"
 #endif
 
-// #include "zmdnet-inpcb.h" // TODO
+// #include "zmdnet-inpcb.h" 
 #include <limits.h>
 #include <sys/types.h>
 
@@ -535,7 +535,7 @@ struct selinfo
 #endif
 
 #if defined(DARWIN) || defined(__FreeBSD__) || defined(__linux__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(_WIN32)
-// #include "zmdnet-ip6var.h" // TODO
+#include "../userland/ipv6var.h"
 #else
 #include <netinet6/ip6_var.h>
 #endif
@@ -626,6 +626,7 @@ struct selinfo
 void* hash_init(int elements, u_long *hashmask);
 void hash_destroy(void *vhashtbl, u_long hashmask);
 
+#include "pcb.h"
 
 // typedef struct callout timer_t which is used in the timer
 // related functions such as ZMDNET_TIMER_INIT
@@ -699,7 +700,6 @@ inline unsigned char is_broadcast_addr(struct sockaddr* sa)
 #define clear_so_buf(sb)	 (sb).sb_cc = 0;(sb).sb_mb = NULL;(sb).sb_mbcnt = 0;
 #define get_so_recv_hiwat(so) so->so_rcv.sb_hiwat
 #define get_so_snd_hiwat(so) so->so_snd.sb_hiwat
-// TODO read_random
 #define readrand(buf, len) read_random(buf, len)
 
 /* start OOTB only stuff */
@@ -745,7 +745,7 @@ See static __inline uint16_t ip_newid(void) in netinet/ip_var.h
 
 /* need sctphdr to get port in ZMDNET_IP_OUTPUT. sctphdr defined in zmdnet.h  */
 #include "zmdnet.h"
-#include "ipv6_var.h"
+#include "ipv6var.h"
 extern void userspace_ipv4_output(int *result, struct mbuf *o_pak, struct zmdnet_route *ro, void *stcb, uint32_t vrf_id);
 #if defined(ZMDNET_SUPPORT_IPV6)
 extern void userspace_ipv6_output(int *result, struct mbuf *o_pak, struct route_in6 *ro, void *stcb, uint32_t vrf_id);

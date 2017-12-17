@@ -52,7 +52,7 @@ extern struct base_info_t g_base_info;
  * will need to modify this as approprate. We also need to figure out how to
  * access /dev/random.
  */
-struct zmdnet_pcb
+struct pcb_t
 {
   unsigned int time_of_secret_change; /* number of seconds from timeval.tv_sec */
   unsigned int secret_key[SCTP_HOW_MANY_SECRETS][SCTP_NUMBER_OF_SECRETS];

@@ -142,6 +142,7 @@ list(APPEND zmdnet_headers
     common/callout.h
 	userland/icmp.h
     userland/userland.h
+    userland/ipv6var.h
     common/queue.h
     userland/mbuf.h
 	protocolstack/auth.h
