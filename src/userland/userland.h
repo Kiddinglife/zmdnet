@@ -28,11 +28,13 @@
 #ifndef __ZMDNET_PLATEFORM_H__
 #define __ZMDNET_PLATEFORM_H__
 
-#include "config.h"
+#include "../config.h"
 
 #include <errno.h>
 #include <stdint.h>
 #include <sys/types.h>
+#include <sys/socket.h>
+
 #include "../common/log.h"
 
 #ifdef __FreeBSD__
@@ -744,7 +746,7 @@ See static __inline uint16_t ip_newid(void) in netinet/ip_var.h
 #define ZMDNET_IP_ID(inp) (ip_id)
 
 /* need sctphdr to get port in ZMDNET_IP_OUTPUT. sctphdr defined in zmdnet.h  */
-#include "zmdnet.h"
+#include "../zmdnet.h"
 #include "ipv6var.h"
 extern void userspace_ipv4_output(int *result, struct mbuf *o_pak, struct zmdnet_route *ro, void *stcb, uint32_t vrf_id);
 #if defined(ZMDNET_SUPPORT_IPV6)

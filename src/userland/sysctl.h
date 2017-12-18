@@ -28,7 +28,7 @@
 #ifndef __ZMDNET_SYSCTL_H__
 #define __ZMDNET_SYSCTL_H__
 
-#include "config.h"
+#include "../config.h"
 
 struct sysctl_t
 {

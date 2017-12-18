@@ -30,7 +30,7 @@
 
 #include "../userland/userland.h"
 
-extern void zmdnet_print_addr(struct sockaddr *);
+extern void zmdnet_print_addr(struct sockaddr* sa);
 
 #if defined(ZMDNET_LOCAL_TRACE_BUF) || defined(__APPLE__)
 extern void zmdnet_log_trace(uint32_t fr, const char *str, uint32_t a, uint32_t b,

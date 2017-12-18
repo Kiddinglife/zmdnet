@@ -28,7 +28,7 @@
 #ifndef _ZMDNET_ATOMIC_H_
 #define _ZMDNET_ATOMIC_H_
 
-#include "config.h"
+#include "../config.h"
 
 #include <stdio.h>
 #include <sys/types.h>

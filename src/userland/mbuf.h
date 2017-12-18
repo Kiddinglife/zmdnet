@@ -30,7 +30,8 @@
 
 /* __Userspace__ header file for mbufs */
 
-#include "config.h"
+#include "../config.h"
+
 #include "userland.h"
 
 /* For Linux */
