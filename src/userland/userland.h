@@ -33,9 +33,23 @@
 #include <errno.h>
 #include <stdint.h>
 #include <sys/types.h>
-#include <sys/socket.h>
+#include <stdio.h>
+#include <string.h>
+#include <limits.h>
+#include <sys/types.h>
 
 #include "../common/log.h"
+#include "../common/atomic.h"
+ // typedef struct callout timer_t which is used in the timer
+ // related functions such as ZMDNET_TIMER_INIT
+ // todo port to userspace at line 799
+#include "../common/callout.h"
+
+#include "sockvar.h"
+#include "pcb.h" 
+
+ /* need sctphdr to get port in ZMDNET_IP_OUTPUT. sctphdr defined in zmdnet.h  */
+#include "../zmdnet.h"
 
 #ifdef __FreeBSD__
 #ifndef _SYS_MUTEX_H_
@@ -52,26 +66,6 @@
 #define IPV6_VERSION            0x60
 #endif
 
-/* maxsockets is used in ZMDNET_ZONE_INIT call. It refers to
- * kern.ipc.maxsockets kernel environment variable.
- */
-extern int maxsockets;
-/* int hz; is declared in sys/kern/subr_param.c and refers to kernel timer frequency.
- * See http://ivoras.sharanet.org/freebsd/vmware.html for additional info about kern.hz
- * hz is initialized in void init_param1(void) in that file.
- */
-extern int hz;
-/* The following two ints define a range of available ephermal ports. */
-extern int ipport_firstauto, ipport_lastauto;
-/* nmbclusters is used in zmdnet_usrreq.c (e.g., zmdnet_init). In the FreeBSD kernel,
- *  this is 1024 + maxusers * 64.
- */
-extern int nmbclusters;
-extern int read_random(void *buf, int count); //todo puthLib into init function like zmdnet_init()
-extern int ip_id;
-/* necessary for zmdnet_pcb.c */
-extern int ip_defttl;
-
 #ifdef _WIN32
 
 #include <winsock2.h>
@@ -85,15 +79,15 @@ typedef CRITICAL_SECTION zmdnet_mutex_t;
 #if WINVER < 0x0600
 enum
 {
-  C_SIGNAL = 0,
-  C_BROADCAST = 1,
-  C_MAX_EVENTS = 2
+    C_SIGNAL = 0,
+    C_BROADCAST = 1,
+    C_MAX_EVENTS = 2
 };
 typedef struct
 {
-  u_int waiters_count;
-  CRITICAL_SECTION waiters_count_lock;
-  HANDLE events_[C_MAX_EVENTS];
+    u_int waiters_count;
+    CRITICAL_SECTION waiters_count_lock;
+    HANDLE events_[C_MAX_EVENTS];
 }zmdnet_cond_t;
 void InitializeXPConditionVariable(zmdnet_cond_t *);
 void DeleteXPConditionVariable(zmdnet_cond_t *);
@@ -331,44 +325,44 @@ typedef pthread_t zmdnet_thread_t;
 
 struct ip
 {
-  u_char ip_hl : 4, ip_v : 4;
-  u_char ip_tos;
-  u_short ip_len;
-  u_short ip_id;
-  u_short ip_off;
+    u_char ip_hl : 4, ip_v : 4;
+    u_char ip_tos;
+    u_short ip_len;
+    u_short ip_id;
+    u_short ip_off;
 #define IP_RP 0x8000
 #define IP_DF 0x4000
 #define IP_MF 0x2000
 #define IP_OFFMASK 0x1fff
-  u_char ip_ttl;
-  u_char ip_p;
-  u_short ip_sum;
-  struct in_addr ip_src, ip_dst;
+    u_char ip_ttl;
+    u_char ip_p;
+    u_short ip_sum;
+    struct in_addr ip_src, ip_dst;
 };
 
 struct ifaddrs
 {
-  struct ifaddrs *ifa_next;
-  char *ifa_name;
-  unsigned int ifa_flags;
-  struct sockaddr *ifa_addr;
-  struct sockaddr *ifa_netmask;
-  struct sockaddr *ifa_dstaddr;
-  void *ifa_data;
+    struct ifaddrs *ifa_next;
+    char *ifa_name;
+    unsigned int ifa_flags;
+    struct sockaddr *ifa_addr;
+    struct sockaddr *ifa_netmask;
+    struct sockaddr *ifa_dstaddr;
+    void *ifa_data;
 };
 
 struct udphdr
 {
-  uint16_t uh_sport;
-  uint16_t uh_dport;
-  uint16_t uh_ulen;
-  uint16_t uh_sum;
+    uint16_t uh_sport;
+    uint16_t uh_dport;
+    uint16_t uh_ulen;
+    uint16_t uh_sum;
 };
 
 struct iovec
 {
-  size_t len;
-  char *buf;
+    size_t len;
+    char *buf;
 };
 
 #define iov_base buf
@@ -376,52 +370,52 @@ struct iovec
 
 struct ifa_msghdr
 {
-  uint16_t ifam_msglen;
-  unsigned char ifam_version;
-  unsigned char ifam_type;
-  uint32_t ifam_addrs;
-  uint32_t ifam_flags;
-  uint16_t ifam_index;
-  uint32_t ifam_metric;
+    uint16_t ifam_msglen;
+    unsigned char ifam_version;
+    unsigned char ifam_type;
+    uint32_t ifam_addrs;
+    uint32_t ifam_flags;
+    uint16_t ifam_index;
+    uint32_t ifam_metric;
 };
 
 struct ifdevmtu
 {
-  int ifdm_current;
-  int ifdm_min;
-  int ifdm_max;
+    int ifdm_current;
+    int ifdm_min;
+    int ifdm_max;
 };
 
 struct ifkpi
 {
-  unsigned int ifk_module_id;
-  unsigned int ifk_type;
-  union
-  {
-    void *ifk_ptr;
-    int ifk_value;
-  }ifk_data;
+    unsigned int ifk_module_id;
+    unsigned int ifk_type;
+    union
+    {
+        void *ifk_ptr;
+        int ifk_value;
+    }ifk_data;
 };
 
 struct ifreq
 {
-  char ifr_name[16];
-  union
-  {
-    struct sockaddr ifru_addr;
-    struct sockaddr ifru_dstaddr;
-    struct sockaddr ifru_broadaddr;
-    short ifru_flags;
-    int ifru_metric;
-    int ifru_mtu;
-    int ifru_phys;
-    int ifru_media;
-    int ifru_intval;
-    char* ifru_data;
-    struct ifdevmtu ifru_devmtu;
-    struct ifkpi ifru_kpi;
-    uint32_t ifru_wake_flags;
-  }ifr_ifru;
+    char ifr_name[16];
+    union
+    {
+        struct sockaddr ifru_addr;
+        struct sockaddr ifru_dstaddr;
+        struct sockaddr ifru_broadaddr;
+        short ifru_flags;
+        int ifru_metric;
+        int ifru_mtu;
+        int ifru_phys;
+        int ifru_media;
+        int ifru_intval;
+        char* ifru_data;
+        struct ifdevmtu ifru_devmtu;
+        struct ifkpi ifru_kpi;
+        uint32_t ifru_wake_flags;
+    }ifr_ifru;
 #define ifr_addr        ifr_ifru.ifru_addr
 #define ifr_dstaddr     ifr_ifru.ifru_dstaddr
 #define ifr_broadaddr   ifr_ifru.ifru_broadaddr
@@ -445,29 +439,6 @@ int Win_getifaddrs(struct ifaddrs**);
 int win_if_nametoindex(const char *);
 #define if_nametoindex(x) win_if_nametoindex(x)
 #endif
-
-#if !defined(__FreeBSD__)
-struct mtx
-{
-  int dummy;
-};
-struct sx
-{
-  int dummy;
-};
-#if !defined(__NetBSD__)
-struct selinfo
-{
-  int dummy;
-};
-#endif
-#endif
-
-#include <stdio.h>
-#include <string.h>
-
-#include "../userland/sockvar.h"
-#include "../common/atomic.h"
 
 #if defined(__FreeBSD__) && __FreeBSD_version > 602000
 #include <sys/rwlock.h>
@@ -496,12 +467,8 @@ struct selinfo
 #if defined(HAVE_NETINET_IP_ICMP_H)
 #include <netinet/ip_icmp.h>
 #else
-#include "../userland/icmp.h"
+#include "icmp.h"
 #endif
-
-// #include "zmdnet-inpcb.h" 
-#include <limits.h>
-#include <sys/types.h>
 
 #if !defined(_WIN32)
 #if defined(ZMDNET_SUPPORT_IPV4) || defined(ZMDNET_SUPPORT_IPV6)
@@ -537,12 +504,10 @@ struct selinfo
 #endif
 
 #if defined(DARWIN) || defined(__FreeBSD__) || defined(__linux__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(_WIN32)
-#include "../userland/ipv6var.h"
+#include "ipv6var.h"
 #else
 #include <netinet6/ip6_var.h>
 #endif
-
-#include "pcb.h"
 
 #ifdef HAVE_SYS_QUEUE_H
 #include <sys/queue.h>
@@ -606,7 +571,7 @@ struct selinfo
     ((ro)->ro_rt && (ro)->ro_rt->rt_ifp)
  /******************************************/
 
-#define ZMDNET_GET_IF_INDEX_FROM_ROUTE(ro) 1 /* compiles...  TODO use routing socket to determine */
+#define ZMDNET_GET_IF_INDEX_FROM_ROUTE(ro) 1 /* compiles...  TODO use routing socket to determine this is conected to another todo zmdnet_rtalloc() in route.h */
 // use geconet typeofaddr() this is not cjeck sitelock and linklocal for ipv6
 #ifdef _WIN32
 #define is_ift_loopback(ifn) (strncmp((ifn)->ifn_name, "lo", 2) == 0)
@@ -615,7 +580,7 @@ struct selinfo
 /*
  * Access to IFN's to help with src-addr-selection
  */
-/* This could return VOID if the index works but for BSD we provide both. */
+ /* This could return VOID if the index works but for BSD we provide both. */
 #define get_ifn_void_from_route(ro) (void *)ro->ro_rt->rt_ifp
 #define get_if_index_from_route(ro) 1 /* compiles...  TODO use routing socket to determine */
 #define route_has_valid_ifn(ro) ((ro)->ro_rt && (ro)->ro_rt->rt_ifp)
@@ -624,16 +589,6 @@ struct selinfo
 #define zmdnet_malloc_zero(mret,type,size)  mret = (type*) malloc(size); while (!mret) { mret = (type*) malloc(size);} memset(mret,0,size);
 #define malloc_soname(mret,type,size) zmdnet_malloc_zero(mret,type,size)
 #define zmdnet_free(ptr) free(ptr)
-
-void* hash_init(int elements, u_long *hashmask);
-void hash_destroy(void *vhashtbl, u_long hashmask);
-
-#include "pcb.h"
-
-// typedef struct callout timer_t which is used in the timer
-// related functions such as ZMDNET_TIMER_INIT
-// todo port to userspace at line 799
-#include "../common/callout.h"
 
 /*__Userspace__ defining KTR_SUBSYS 1 as done in os_macosx.h */
 #define KTR_SUBSYS 1
@@ -646,41 +601,6 @@ void hash_destroy(void *vhashtbl, u_long hashmask);
 #define ZMDNET_PACKED
 #define ZMDNET_UNUSED
 #endif
-
-//todo
-struct zmdnet_route
-{
-    int dummy;
-};
-
-struct zmdnet_rtentry
-{
-    int dummy;
-};
-
-static inline void zmdnet_rtalloc(struct zmdnet_route* route)
-{
-
-}
-static inline void zmdnet_rtfree(struct zmdnet_rtentry* rtentry)
-{
-
-}
-
-/*mtu*/
-extern int zmdnet_get_mtu_from_ifn(uint32_t if_index, int af);
-#define mtu_from_ifn_info(ifn, ifn_index, af) zmdnet_get_mtu_from_ifn(ifn_index, af)
-#define mtu_from_route(ifa, sa, rt) ((rt != NULL) ? rt->rt_rmx.rmx_mtu : 0)
-#define mtu_from_intfc(ifn) zmdnet_get_mtu_from_ifn(if_nametoindex(((struct ifaddrs *) (ifn))->ifa_name), AF_INET)
-#define set_mtu_route(sa, rt, mtu) if(rt != NULL) rt->rt_rmx.rmx_mtu = mtu;
-
-// TODO
-// call get_inf() and then compare if it is braodcast addr
-//#define is_broadcast_addr(dst, m) 0
-inline unsigned char is_broadcast_addr(struct sockaddr* sa)
-{
-    return 1;
-}
 
 // v6 hop limit 
 #define GET_HLIM(inp, ro) 128 /* As done for __Windows__ */
@@ -723,19 +643,6 @@ inline unsigned char is_broadcast_addr(struct sockaddr* sa)
 #define	IP_RAWOUTPUT		0x2
 /* end OOTB only stuff */
 
-#define AF_CONN 123
-struct sockaddr_conn
-{
-#ifdef HAVE_SCONN_LEN
-  uint8_t sconn_len;
-  uint8_t sconn_family;
-#else
-  uint16_t sconn_family;
-#endif
-  uint16_t sconn_port;
-  void *sconn_addr;
-};
-
 #define	M_NOTIFICATION		M_PROTO5	/* zmdnet protocol  specific mbuf flags. */
 
 /* Defining ZMDNET_IP_ID macro.
@@ -744,16 +651,6 @@ In netinet/ip_var.h, we have extern u_short	ip_id; (enclosed within _KERNEL_)
 See static __inline uint16_t ip_newid(void) in netinet/ip_var.h
 */
 #define ZMDNET_IP_ID(inp) (ip_id)
-
-/* need sctphdr to get port in ZMDNET_IP_OUTPUT. sctphdr defined in zmdnet.h  */
-#include "../zmdnet.h"
-#include "ipv6var.h"
-extern void userspace_ipv4_output(int *result, struct mbuf *o_pak, struct zmdnet_route *ro, void *stcb, uint32_t vrf_id);
-#if defined(ZMDNET_SUPPORT_IPV6)
-extern void userspace_ipv6_output(int *result, struct mbuf *o_pak, struct route_in6 *ro, void *stcb, uint32_t vrf_id);
-#endif
-
-struct mbuf*  get_mbuf_for_msg(unsigned int space_needed, int want_header, int how, int all_in_one_buf, int type);
 
 /* with the current included files, CMSG_ALIGN is defined in Linux but in FreeBSD, it is behind a _KERNEL in sys/socket.h ...*/
 #if defined(__DragonFly__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__native_client__)
@@ -809,5 +706,63 @@ for ((var) = ((head)->tqh_first); (var) && ((tvar) = TAILQ_NEXT((var), field), 1
 #endif
 
 #define zmdnet_is_listening(inp) ((inp->sctp_flags & ZMDNET_PCB_FLAGS_ACCEPTING) != 0)
+
+#define AF_CONN 123
+struct sockaddr_conn
+{
+#ifdef HAVE_SCONN_LEN
+    uint8_t sconn_len;
+    uint8_t sconn_family;
+#else
+    uint16_t sconn_family;
+#endif
+    uint16_t sconn_port;
+    void *sconn_addr;
+};
+
+/* maxsockets is used in ZMDNET_ZONE_INIT call. It refers to
+* kern.ipc.maxsockets kernel environment variable.
+*/
+extern int maxsockets;
+/* int hz; is declared in sys/kern/subr_param.c and refers to kernel timer frequency.
+* See http://ivoras.sharanet.org/freebsd/vmware.html for additional info about kern.hz
+* hz is initialized in void init_param1(void) in that file.
+*/
+extern int hz;
+/* The following two ints define a range of available ephermal ports. */
+extern int ipport_firstauto, ipport_lastauto;
+/* nmbclusters is used in zmdnet_usrreq.c (e.g., zmdnet_init). In the FreeBSD kernel,
+*  this is 1024 + maxusers * 64.
+*/
+extern int nmbclusters;
+extern int read_random(void *buf, int count); //todo puthLib into init function like zmdnet_init()
+extern int ip_id;
+/* necessary for zmdnet_pcb.c */
+extern int ip_defttl;
+
+void* hash_init(int elements, u_long *hashmask);
+void hash_destroy(void *vhashtbl, u_long hashmask);
+
+/*mtu*/
+extern int zmdnet_get_mtu_from_ifn(uint32_t if_index, int af);
+#define mtu_from_ifn_info(ifn, ifn_index, af) zmdnet_get_mtu_from_ifn(ifn_index, af)
+#define mtu_from_route(ifa, sa, rt) ((rt != NULL) ? rt->rt_rmx.rmx_mtu : 0)
+#define mtu_from_intfc(ifn) zmdnet_get_mtu_from_ifn(if_nametoindex(((struct ifaddrs *) (ifn))->ifa_name), AF_INET)
+#define set_mtu_route(sa, rt, mtu) if(rt != NULL) rt->rt_rmx.rmx_mtu = mtu;
+
+// TODO
+// call get_inf() and then compare if it is braodcast addr
+//#define is_broadcast_addr(dst, m) 0
+inline unsigned char is_broadcast_addr(struct sockaddr* sa)
+{
+    return 1;
+}
+
+extern void userspace_ipv4_output(int *result, struct mbuf *o_pak, struct zmdnet_route *ro, void *stcb, uint32_t vrf_id);
+#if defined(ZMDNET_SUPPORT_IPV6)
+extern void userspace_ipv6_output(int *result, struct mbuf *o_pak, struct route_in6 *ro, void *stcb, uint32_t vrf_id);
+#endif
+
+struct mbuf*  get_mbuf_for_msg(unsigned int space_needed, int want_header, int how, int all_in_one_buf, int type);
 
 #endif /* SRC_SYSTEM_ZMDNET_OS_USER_SPACE_H_ */

@@ -1,6 +1,9 @@
 #include "../common/log.h"
 #include "../userland/userland.h"
+
+#ifndef _WIN32
 #include <arpa/inet.h>
+#endif
 
 #if defined(ZMDNET_LOCAL_TRACE_BUF) || defined(__APPLE__)
 void zmdnet_log_trace(uint32_t fr, const char *str, uint32_t a, uint32_t b,
