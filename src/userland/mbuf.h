@@ -427,4 +427,17 @@ extern struct mbstat mbstat; /* General mbuf stats/infos */
 if(m->m_flags & M_PKTHDR) {MH_ALIGN(m, len);} \
 else if ((m->m_flags & M_EXT) == 0) {M_ALIGN(m, len);}
 
+/* For BSD this just accesses the M_PKTHDR length so it operates on an mbuf with hdr flag.
+ * Other O/S's may have seperate packet header and mbuf chain pointers.. thus we need macros.
+*/
+#define mbuf_header_to_chain(m) (m)
+#define mbuf_detach_header_from_chain(m)
+#define mbuf_header_len(m) ((m)->m_pkthdr.len)
+#define mbuf_get_header_for_output(o_pak) 0
+#define mbuf_release_header(m)
+#define mbuf_release_pkt(m) mbuf_m_freem(m)
+#define mbuf_get_pkt_vrfid(m, vrf_id)  ((vrf_id = SCTP_DEFAULT_VRFID) != SCTP_DEFAULT_VRFID)
+/* Attach the chain of data into the sendable packet. */
+#define mbuf_attach_chain(pak, m, packet_length) pak = m; pak->m_pkthdr.len = packet_length;
+
 #endif

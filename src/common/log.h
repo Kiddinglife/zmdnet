@@ -28,14 +28,18 @@
 #ifndef __ZMDNET_MLOG_H__
 #define __ZMDNET_MLOG_H__
 
-#include "../userland/userland.h"
-#include <sys/socket.h>
+#include "../userland/pcb.h"
+
+#if defined(__FreeBSD__) && __FreeBSD_version >= 801000
+VNET_DECLARE(struct base_info_t, g_base_info) ;
+#else
+extern struct base_info_t g_base_info;
+#endif
 
 extern void zmdnet_print_addr(struct sockaddr* sa);
 
 #if defined(ZMDNET_LOCAL_TRACE_BUF) || defined(__APPLE__)
-extern void zmdnet_log_trace(uint32_t fr, const char *str, uint32_t a, uint32_t b,
-    uint32_t c, uint32_t d, uint32_t e, uint32_t f);
+extern void zmdnet_log_trace(uint32_t fr, const char *str, uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f);
 #endif
 
 #define panic(...) zmdnet_printf("%s(): ", __func__);zmdnet_printf(__VA_ARGS__);zmdnet_printf("\n");abort()
@@ -48,13 +52,9 @@ extern void zmdnet_log_trace(uint32_t fr, const char *str, uint32_t a, uint32_t 
 
 // todo use same var name eg. g_base_info.debug_printf_func
 #define g_base_info_var(m) g_base_info.m
-//SCTP_BASE_INFO
 #define g_base_info_pcb_var(m) g_base_info.pcbinfo.m
-//SCTP_BASE_STATS
 #define g_base_info_stats g_base_info.stats
-//SCTP_BASE_STAT
 #define g_base_info_stats_var(m)     g_base_info.stats.m
-//SCTP_BASE_SYSCTL
 #define g_base_info_sysctl_var(m) g_base_info.sysctl.m
 
 #define zmdnet_printf(...) if(g_base_info.debug_printf_func) g_base_info.debug_printf_func(__VA_ARGS__)
@@ -96,18 +96,5 @@ if(g_base_info_sysctl_var(logging_level) & ZMDNET_LTRACE_CHUNK_ENABLE) zmdnet_lo
 #endif
 
 #define iamhere() zmdnet_printf("%s:%d at %s\n", __FILE__, __LINE__ , __func__)
-
-/* For BSD this just accesses the M_PKTHDR length so it operates on an mbuf with hdr flag. 
- * Other O/S's may have seperate packet header and mbuf chain pointers.. thus we need macros.
-*/
-#define mbuf_header_to_chain(m) (m)
-#define mbuf_detach_header_from_chain(m)
-#define mbuf_header_len(m) ((m)->m_pkthdr.len)
-#define mbuf_get_header_for_output(o_pak) 0
-#define mbuf_release_header(m)
-#define mbuf_release_pkt(m)	mbuf_m_freem(m)
-#define mbuf_get_pkt_vrfid(m, vrf_id)  ((vrf_id = SCTP_DEFAULT_VRFID) != SCTP_DEFAULT_VRFID)
-/* Attach the chain of data into the sendable packet. */
-#define mbuf_attach_chain(pak, m, packet_length) pak = m; pak->m_pkthdr.len = packet_length; 
 
 #endif

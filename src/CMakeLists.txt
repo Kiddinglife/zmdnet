@@ -55,8 +55,9 @@ add_definitions(-DZMDNET_PROCESS_LEVEL_LOCKS)
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	add_definitions(-D_GNU_SOURCE)
 	option(_GNU_SOURCE "_GNU_SOURCE" 1)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}     -Wno-implicit-function-declaration")
 endif ()
-
+# -Werror=implicit-function-declaration
 if (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
 	add_definitions(-U__FreeBSD__)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}     -Wno-address-of-packed-member")
