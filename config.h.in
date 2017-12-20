@@ -16,15 +16,15 @@
 #endif
 
 #ifndef HAVE_PEELOFF_SOCKOPT
-#cmakedefine have_peeloff_sockopt
+#cmakedefine HAVE_PEELOFF_SOCKOPT
 #endif
 
 #ifndef ZMDNET_PROCESS_LEVEL_LOCKS
 #cmakedefine ZMDNET_PROCESS_LEVEL_LOCKS
 #endif
 
-#ifndef HAVE_IPSEC
-#cmakedefine have_IPSEC
+#ifndef ZMDNET_HAVE_IPSEC
+#cmakedefine ZMDNET_HAVE_IPSEC
 #endif
 
 #ifndef ZMDNET_SUPPORT_IPV6
@@ -43,24 +43,24 @@
 #cmakedefine ZMDNET_LOCAL_TRACE_BUF
 #endif
 
-#ifndef HAVE_SYS_QUEUE_H
-#cmakedefine HAVE_SYS_QUEUE_H
+#ifndef ZMDNET_HAVE_SYS_QUEUE_H
+#cmakedefine ZMDNET_HAVE_SYS_QUEUE_H 
 #endif
 
-#ifndef HAVE_LINUX_IF_ADDR_H
-#cmakedefine have_linux_if_addr_h
+#ifndef ZMDNET_HAVE_LINUX_IF_ADDR_H
+#cmakedefine ZMDNET_HAVE_LINUX_IF_ADDR_H 
 #endif
 
-#ifndef HAVE_LINUX_RTNETLINK_H
-#cmakedefine HAVE_LINUX_RTNETLINK_H
+#ifndef ZMDNET_HAVE_LINUX_RTNETLINK_H
+#cmakedefine ZMDNET_HAVE_LINUX_RTNETLINK_H
 #endif
 
-#ifndef HAVE_NETINET_IP_ICMP_H
-#cmakedefine HAVE_NETINET_IP_ICMP_H
+#ifndef ZMDNET_HAVE_NETINET_IP_ICMP_H
+#cmakedefine ZMDNET_HAVE_NETINET_IP_ICMP_H
 #endif
 
-#ifndef HAVE_STDATOMIC_H
-#cmakedefine HAVE_STDATOMIC_H
+#ifndef ZMDNET_HAVE_STDATOMIC_H
+#cmakedefine ZMDNET_HAVE_STDATOMIC_H
 #endif
 
 #ifndef HAVE_SA_LEN

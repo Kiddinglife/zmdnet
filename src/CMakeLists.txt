@@ -148,6 +148,7 @@ list(APPEND zmdnet_headers
 	protocolstack/auth.h
 	userland/sock.h
 	userland/sockvar.h
+	userland/portable.h
     protocolstack/constant.h  
     userland/pcb.h 
     common/util.h

@@ -29,6 +29,7 @@
 #define __ZMDNET_MLOG_H__
 
 #include "../userland/userland.h"
+#include <sys/socket.h>
 
 extern void zmdnet_print_addr(struct sockaddr* sa);
 

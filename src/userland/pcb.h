@@ -31,7 +31,6 @@
 #include "../protocolstack/constant.h"
 #include "sysctl.h"
 
-
 /* All static structures that
  * anchor the system must be here.
  */

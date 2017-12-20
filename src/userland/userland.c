@@ -1,5 +1,14 @@
 #include "userland.h"
 
+// need sctphdr to get port in ZMDNET_IP_OUTPUT. sctphdr defined in zmdnet.h
+#include "../zmdnet.h"
+#include "../common/log.h"
+#include "../common/atomic.h"
+// typedef struct callout timer_t which is used in the timer
+// related functions such as ZMDNET_TIMER_INIT
+// todo port to userspace at line 799
+#include "../common/callout.h"
+
 #define uHZ 1000
 /* See zmdnet-env.h for comments about these variables */
 int maxsockets = 25600;

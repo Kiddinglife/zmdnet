@@ -33,19 +33,7 @@ extern "C"
   {
 #endif
 
-#include <errno.h>
-#include <sys/types.h>
-
-#ifdef _WIN32
-#ifdef _MSC_VER
-#pragma warning(disable: 4200)
-#endif
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#else
-#include <sys/socket.h>
-#include <netinet/in.h>
-#endif
+#include "portable.h"
 
 #ifndef MSG_NOTIFICATION
 /* This definition MUST be in sync with zmdnet-socket-var.h */
@@ -107,26 +95,17 @@ struct zmdnet_common_header
 #undef ZMDNET_PACKED
 
 #define AF_CONN 123
-/* The definition of struct sockaddr_conn MUST be in
- * tune with other sockaddr_* structures.
- */
-#if defined(__APPLE__) || defined(__Bitrig__) || defined(__DragonFly__) || \
-    defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
-struct sockaddr_conn
-  {
-    uint8_t sconn_len;
-    uint8_t sconn_family;
-    uint16_t sconn_port;
-    void *sconn_addr;
-  };
-#else
 struct sockaddr_conn
 {
-  uint16_t sconn_family;
-  uint16_t sconn_port;
-  void *sconn_addr;
-};
+#ifdef HAVE_SCONN_LEN
+    uint8_t sconn_len;
+    uint8_t sconn_family;
+#else
+    uint16_t sconn_family;
 #endif
+    uint16_t sconn_port;
+    void *sconn_addr;
+};
 
 union zmdnet_sockstore
 {

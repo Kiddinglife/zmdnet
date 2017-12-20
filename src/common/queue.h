@@ -28,8 +28,8 @@
  *
  */
 
-#ifndef __zmdnet_queue_h__
-#define	__zmdnet_queue_h__
+#ifndef _my_QUEUE_H_
+#define	_my_QUEUE_H_
 
 /*
  * This file defines four types of data structures: singly-linked lists,

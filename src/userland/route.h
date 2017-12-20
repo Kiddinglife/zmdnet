@@ -28,7 +28,7 @@
 #ifndef __ZMDNET_ROUTE_H__
 #define __ZMDNET_ROUTE_H__
 
-#include "userland.h"
+#include "portable.h"
 
 // todo this is not actully used mtx_init() and mtx_destroy() are not implemented
 #define mtx_lock(arg1)
