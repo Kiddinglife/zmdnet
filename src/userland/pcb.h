@@ -42,7 +42,8 @@ struct base_info_t
     void (*debug_printf_func)(const char *format, ...);
 };
 
-extern struct base_info_t* g_base_info();
+//extern struct base_info_t* g_base_info();
+extern struct base_info_t g_base_info;
 
 /*-
  * Here we have all the relevant information for each SCTP entity created. We

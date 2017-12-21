@@ -204,7 +204,7 @@ static void test_read_random()
 #include "../src/common/log.h"
 int main(int argc, char *argv[])
 {
-  g_base_info()->debug_printf_func = debug_printf;
+  g_base_info.debug_printf_func = debug_printf;
   test_read_random();
   return 0;
 }
