@@ -31,11 +31,12 @@
 #include "../userland/pcb.h"
 
 #if defined(ZMDNET_LOCAL_TRACE_BUF) || defined(__APPLE__)
-extern void zmdnet_log_trace(uint32_t fr, const char *str, uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f);
+extern void zmdnet_log_trace(uint32_t fr, const char *str, uint32_t a,
+    uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f);
 #endif
 
 extern void zmdnet_print_addr(struct sockaddr* sa);
-#define zmdnet_printf(...) if(g_base_info.debug_printf_func) g_base_info.debug_printf_func(__VA_ARGS__)
+#define zmdnet_printf(...) if(g_base_info()->debug_printf_func) g_base_info()->debug_printf_func(__VA_ARGS__)
 #define panic(...) zmdnet_printf("%s(): ", __func__);zmdnet_printf(__VA_ARGS__);zmdnet_printf("\n");abort()
 
 #if defined(RUN_TIME_CHECKS) || defined(ZMDNET_DEBUG)
@@ -46,11 +47,11 @@ extern void zmdnet_print_addr(struct sockaddr* sa);
 #endif
 
 // todo use same var name eg. g_base_info.debug_printf_func
-#define g_base_info_var(m) g_base_info.m
-#define g_base_info_pcb_var(m) g_base_info.pcbinfo.m
-#define g_base_info_stats g_base_info.stats
-#define g_base_info_stats_var(m)     g_base_info.stats.m
-#define g_base_info_sysctl_var(m) g_base_info.sysctl.m
+#define g_base_info_var(m) g_base_info()->m
+#define g_base_info_pcb_var(m) g_base_info()->pcbinfo.m
+#define g_base_info_stats g_base_info()->stats
+#define g_base_info_stats_var(m)     g_base_info()->stats.m
+#define g_base_info_sysctl_var(m) g_base_info()->sysctl.m
 
 #if defined(ZMDNET_DEBUG)
 #include "../protocolstack/constant.h"

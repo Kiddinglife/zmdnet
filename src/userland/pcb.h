@@ -42,6 +42,7 @@ struct base_info_t
     void (*debug_printf_func)(const char *format, ...);
 };
 
+extern struct base_info_t* g_base_info();
 
 /*-
  * Here we have all the relevant information for each SCTP entity created. We
@@ -54,11 +55,5 @@ struct pcb_t
   unsigned int secret_key[SCTP_HOW_MANY_SECRETS][SCTP_NUMBER_OF_SECRETS];
   unsigned int size_of_a_cookie;
 };
-
-#if defined(__FreeBSD__) && __FreeBSD_version >= 801000
-VNET_DECLARE(struct base_info_t, g_base_info) ;
-#else
-extern struct base_info_t g_base_info;
-#endif
 
 #endif

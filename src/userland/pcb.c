@@ -1,7 +1,9 @@
 #include "pcb.h"
 
-#if defined(__FreeBSD__) && __FreeBSD_version >= 801000
-VNET_DEFINE(struct base_info_t, g_base_info);
-#else
-struct base_info_t g_base_info = {0};
-#endif
+static struct base_info_t global_base_info = {0};
+struct base_info_t* g_base_info()
+{
+    if(global_base_info.debug_printf_func != 0)
+      printf("not zero");
+    return &global_base_info;
+}

@@ -321,11 +321,11 @@ execute_process(COMMAND ./configure --prefix=${CMAKE_SOURCE_DIR}/thirdparty/libs
 execute_process(COMMAND make 
   WORKING_DIRECTORY ./thirdparty/sodium)
 
-execute_process(COMMAND sudo make install
+execute_process(COMMAND make install
   WORKING_DIRECTORY ./thirdparty/sodium)
 
-execute_process(COMMAND sudo chmod 777 -R .
-  WORKING_DIRECTORY ./thirdparty/)
+# execute_process(COMMAND sudo chmod 777 -R .
+#   WORKING_DIRECTORY ./thirdparty/)
 #################################################
 # INCLUDE SUBDIRS
 #################################################

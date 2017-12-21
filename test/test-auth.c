@@ -96,35 +96,21 @@
 //}
 //#define _GNU_SOURCE     /* To get defns of NI_MAXSERV and NI_MAXHOST */
 
-#ifdef _WIN32
-#define _CRT_SECURE_NO_WARNINGS
-#endif
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdarg.h>
-#include "../src/common/log.h"
-
-#include <netdb.h>
-#include <ifaddrs.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <linux/if_link.h>
-
-#include "../src/protocolstack/auth.h"
-
-void debug_printf(const char *format, ...)
-{
-  va_list ap;
-  va_start(ap, format);
-  vprintf(format, ap);
-  va_end(ap);
-}
-
-int main(int argc, char *argv[])
-{
-//  g_base_info.debug_printf_func = debug_printf;
+//#ifdef _WIN32
+//#define _CRT_SECURE_NO_WARNINGS
+//#endif
+//
+//#include <stdio.h>
+//#include <stdlib.h>
+//#include <string.h>
+//#include <stdarg.h>
+//#include "../src/common/log.h"
+//
+//#include <netdb.h>
+//#include <ifaddrs.h>
+//#include <stdlib.h>
+//#include <unistd.h>
+//#include <linux/if_link.h>
 //
 //  struct ifaddrs *ifaddr, *ifa;
 //  int family, s, n;
@@ -191,11 +177,35 @@ int main(int argc, char *argv[])
 //  freeifaddrs(ifaddr);
 //  exit(EXIT_SUCCESS);
 
+#include "../src/protocolstack/auth.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdarg.h>
+
+static void debug_printf(const char *format, ...)
+{
+  va_list ap;
+  va_start(ap, format);
+  vprintf(format, ap);
+  va_end(ap);
+}
+
+static void test_read_random()
+{
+  printf("test_read_random()\n");
   unsigned int v;
   char buf[1024];
   read_random(buf, 1024);
   memcpy(&v, buf, 4);
   printf("%u\n", v);
+}
 
+#include "../src/common/log.h"
+int main(int argc, char *argv[])
+{
+  g_base_info()->debug_printf_func = debug_printf;
+  test_read_random();
+  return 0;
 }
 

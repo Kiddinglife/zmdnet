@@ -33,7 +33,7 @@ find_package(Threads)
 include_directories(${CMAKE_SOURCE_DIR}/src)
 
 set(check_programs
-	test-system-zmdnet-env.c
+	test-auth.c
 )
 
 #################################################
