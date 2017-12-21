@@ -185,7 +185,6 @@ list(APPEND zmdnet_headers
 list(APPEND zmdnet_sources
     userland/mbuf.c
 	protocolstack/auth.c
-    userland/userland.c
     userland/portable.c
 	userland/sock.c
     userland/pcb.c

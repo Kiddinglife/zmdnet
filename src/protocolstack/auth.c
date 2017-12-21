@@ -1,6 +1,5 @@
 
 #include "../common/log.h"
-#include "../../thirdparty/libs/sodiumlib/include/sodium.h"
 
 static int inited_sodium = 0;
 void read_random(void *buf, int count)

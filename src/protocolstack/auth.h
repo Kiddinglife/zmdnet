@@ -28,6 +28,7 @@
 #ifndef __ZMDNET_AUTH_H__
 #define __ZMDNET_AUTH_H__
 
-extern void read_random(void *buf, int count);
+#include "../../thirdparty/libs/sodiumlib/include/sodium.h"
 
+extern void read_random(void *buf, int count);
 #endif
