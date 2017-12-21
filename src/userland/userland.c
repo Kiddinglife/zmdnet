@@ -49,27 +49,3 @@ void hash_destroy(void *vhashtbl, u_long hashmask)
         }
     zmdnet_free(hashtbl);
 }
-
-#ifdef _WIN32
-int read_random(void *buf, int count)
-{
-    HMODULE hLib = LoadLibrary("ADVAPI32.DLL");
-    if (hLib)
-    {
-        BOOLEAN(APIENTRY *pfn)(void*, ULONG) =
-            (BOOLEAN(APIENTRY *)(void*, ULONG))GetProcAddress(hLib, "SystemFunction036");
-        if (pfn)
-            if (!pfn(buf, count))
-                panic("%s:line%d:pfn() failed !\n", __func__, __LINE__);
-        FreeLibrary(hLib);
-    }
-    return (count);
-}
-#else
-#include <bsd/stdlib.h>
-int read_random(void *buf, int count)
-{
-    arc4random_buf(buf, count);
-    return (count);
-}
-#endif

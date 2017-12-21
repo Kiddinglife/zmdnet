@@ -1,5 +1,16 @@
-void hello1()
+#include "../../thirdparty/libs/sodiumlib/include/sodium.h"
+#include "../common/log.h"
+
+static int inited_sodium = 0;
+void read_random(void *buf, int count)
 {
-	int a =1;
-	a+=1;
+  if(!inited_sodium)
+  {
+    if (sodium_init() == -1)
+    {
+      panic("init sodium failed!");
+    }
+    inited_sodium = 1;
+  }
+  randombytes_buf(buf, count);
 }

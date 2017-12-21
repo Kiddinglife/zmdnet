@@ -30,19 +30,14 @@
 
 #include "../userland/pcb.h"
 
-#if defined(__FreeBSD__) && __FreeBSD_version >= 801000
-VNET_DECLARE(struct base_info_t, g_base_info) ;
-#else
-extern struct base_info_t g_base_info;
-#endif
-
-extern void zmdnet_print_addr(struct sockaddr* sa);
-
 #if defined(ZMDNET_LOCAL_TRACE_BUF) || defined(__APPLE__)
 extern void zmdnet_log_trace(uint32_t fr, const char *str, uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f);
 #endif
 
+extern void zmdnet_print_addr(struct sockaddr* sa);
+#define zmdnet_printf(...) if(g_base_info.debug_printf_func) g_base_info.debug_printf_func(__VA_ARGS__)
 #define panic(...) zmdnet_printf("%s(): ", __func__);zmdnet_printf(__VA_ARGS__);zmdnet_printf("\n");abort()
+
 #if defined(RUN_TIME_CHECKS) || defined(ZMDNET_DEBUG)
 #include <stdlib.h>
 #define zmdnet_assert(cond,args) if (!(cond)) panic args
@@ -57,8 +52,6 @@ extern void zmdnet_log_trace(uint32_t fr, const char *str, uint32_t a, uint32_t 
 #define g_base_info_stats_var(m)     g_base_info.stats.m
 #define g_base_info_sysctl_var(m) g_base_info.sysctl.m
 
-#define zmdnet_printf(...) if(g_base_info.debug_printf_func) g_base_info.debug_printf_func(__VA_ARGS__)
-
 #if defined(ZMDNET_DEBUG)
 #include "../protocolstack/constant.h"
 #define zmdnet_debug(level, ...) if ((g_base_info_sysctl_var(allowed_debug_levels)) & level) {zmdnet_printf(__VA_ARGS__);}
@@ -69,12 +62,12 @@ extern void zmdnet_log_trace(uint32_t fr, const char *str, uint32_t a, uint32_t 
 #endif
 
 // ??? i think we only need one macro right? ZMDNET_LOCAL_TRACE_BUF or ZMDNET_LTRACE_CHUNKS ???
-#if defined(ZMDNET_LOCAL_TRACE_BUF)
-#define GET_CYCLECOUNT 0 /*get_cyclecount() // TODO use gettimeofday to get timestamp */
-#define zmdnet_log_trace mlog_trace  /* <<< SCTP_CTR6 */
-#else
-#define zmdnet_log_trace  /* <<< SCTP_CTR6 */
-#endif
+//#if defined(ZMDNET_LOCAL_TRACE_BUF)
+//#define GET_CYCLECOUNT 0 /*get_cyclecount() // TODO use gettimeofday to get timestamp */
+//#define zmdnet_log_trace mlog_trace  /* <<< SCTP_CTR6 */
+//#else
+//#define zmdnet_log_trace  /* <<< SCTP_CTR6 */
+//#endif
 
 #ifdef ZMDNET_LTRACE_CHUNKS
 #define zmdnet_ltrace_chunk(a, b, c, d) \

@@ -186,6 +186,7 @@ list(APPEND zmdnet_sources
     userland/mbuf.c
 	protocolstack/auth.c
     userland/userland.c
+    userland/portable.c
 	userland/sock.c
     userland/pcb.c
     common/util.c
@@ -200,6 +201,13 @@ if (WIN32)
 	target_link_libraries(zmdnet ws2_32)
 	target_link_libraries(zmdnet-static ws2_32)
 endif ()
+
+target_link_libraries(zmdnet bsd)
+target_link_libraries(zmdnet-static bsd)
+    
+FIND_LIBRARY(MY_LIB PATHS "../thirdparty/libs")
+target_link_libraries(zmdnet ${MY_LIB})
+target_link_libraries(zmdnet-static ${MY_LIB})
 
 set_target_properties(zmdnet-static PROPERTIES OUTPUT_NAME "zmdnet")
 set_target_properties(zmdnet PROPERTIES IMPORT_SUFFIX "_import.lib")

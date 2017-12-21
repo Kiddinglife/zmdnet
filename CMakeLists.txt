@@ -302,6 +302,30 @@ endif ()
 
 CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/config.h.in ${CMAKE_REQUIRED_INCLUDES}/config.h)
 
+set (git_cmd "git")
+set (git_arg "pull")
+message(STATUS "git pull sodium")
+execute_process(COMMAND git pull
+  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+  OUTPUT_VARIABLE git_result)
+message(STATUS "${git_result}")
+
+#message(STATUS "run ./thirdparty/autogen.sh")
+execute_process(COMMAND ./autogen.sh
+  WORKING_DIRECTORY ./thirdparty/sodium)
+# message(STATUS "\n${git_result}")
+
+execute_process(COMMAND ./configure --prefix=${CMAKE_SOURCE_DIR}/thirdparty/libs/sodiumlib --sysconfdir=/etc 
+  WORKING_DIRECTORY ./thirdparty/sodium)
+
+execute_process(COMMAND make 
+  WORKING_DIRECTORY ./thirdparty/sodium)
+
+execute_process(COMMAND sudo make install
+  WORKING_DIRECTORY ./thirdparty/sodium)
+
+execute_process(COMMAND sudo chmod 777 -R .
+  WORKING_DIRECTORY ./thirdparty/)
 #################################################
 # INCLUDE SUBDIRS
 #################################################

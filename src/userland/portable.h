@@ -681,7 +681,8 @@ for ((var) = ((head)->tqh_first); (var) && ((tvar) = TAILQ_NEXT((var), field), 1
 (timeval_ptr)->tv_sec = (time_t_inteval) / 1000;\
 (timeval_ptr)->tv_usec = ((time_t_inteval) % 1000) * 1000;
 
-inline void timevalsumvoid(struct timeval* a, struct timeval* b, struct timeval* result)
+inline void timevalsumvoid(struct timeval* a, struct timeval* b,
+    struct timeval* result)
 {
 
   result->tv_sec = (a)->tv_sec + (b)->tv_sec;
@@ -692,7 +693,8 @@ inline void timevalsumvoid(struct timeval* a, struct timeval* b, struct timeval*
     result->tv_usec -= 1000000;
   }
 }
-inline void timevalsubvoid(struct timeval* a, struct timeval* b, struct timeval* result)
+inline void timevalsubvoid(struct timeval* a, struct timeval* b,
+    struct timeval* result)
 {
   result->tv_sec = (a)->tv_sec - (b)->tv_sec;
   result->tv_usec = (a)->tv_usec - (b)->tv_usec;
@@ -709,7 +711,6 @@ inline int timevalsub(struct timeval* a, struct timeval* b)
   /* result = a-b */
   timevalsubvoid(a, b, &result);
   int retval = result.tv_sec * 1000 + result.tv_usec / 1000;
-  zmdnet_debug(0,"Computed Time Difference : %d msecs\n", retval);
   return ((retval < 0) ? -1 : retval);
 }
 
@@ -721,7 +722,7 @@ inline void timevalsum(struct timeval* a, time_t inteval,
   timevalsumvoid(a, &tv, result);
 }
 
-inline void timevalsubinterval(struct timeval* a,  time_t inteval,
+inline void timevalsubinterval(struct timeval* a, time_t inteval,
     struct timeval* result)
 {
   struct timeval tv;
@@ -751,7 +752,6 @@ extern int ipport_firstauto, ipport_lastauto;
  *  this is 1024 + maxusers * 64.
  */
 extern int nmbclusters;
-extern int read_random(void *buf, int count); //todo puthLib into init function like zmdnet_init()
 extern int ip_id;
 /* necessary for zmdnet_pcb.c */
 extern int ip_defttl;
@@ -766,13 +766,7 @@ extern int zmdnet_get_mtu_from_ifn(uint32_t if_index, int af);
 #define mtu_from_intfc(ifn) zmdnet_get_mtu_from_ifn(if_nametoindex(((struct ifaddrs *) (ifn))->ifa_name), AF_INET)
 #define set_mtu_route(sa, rt, mtu) if(rt != NULL) rt->rt_rmx.rmx_mtu = mtu;
 
-// TODO
-// call get_inf() and then compare if it is braodcast addr
-//#define is_broadcast_addr(dst, m) 0
-inline unsigned char is_broadcast_addr(struct sockaddr* sa)
-{
-  return 1;
-}
+int is_broadcast_ipv4addr(struct sockaddr* sa);
 struct zmdnet_route;
 struct mbuf;
 extern void userspace_ipv4_output(int *result, struct mbuf *o_pak,
