@@ -201,12 +201,8 @@ if (WIN32)
 	target_link_libraries(zmdnet-static ws2_32)
 endif ()
 
-target_link_libraries(zmdnet bsd)
-target_link_libraries(zmdnet-static bsd)
-    
-FIND_LIBRARY(MY_LIB PATHS "../thirdparty/libs")
-target_link_libraries(zmdnet ${MY_LIB})
-target_link_libraries(zmdnet-static ${MY_LIB})
+target_link_libraries(zmdnet  "${CMAKE_SOURCE_DIR}/thirdparty/libs/sodiumlib/lib/v141/dynamic/libsodium.lib")
+target_link_libraries(zmdnet-static "${CMAKE_SOURCE_DIR}/thirdparty/libs/sodiumlib/lib/v141/static/libsodium.lib")
 
 set_target_properties(zmdnet-static PROPERTIES OUTPUT_NAME "zmdnet")
 set_target_properties(zmdnet PROPERTIES IMPORT_SUFFIX "_import.lib")
