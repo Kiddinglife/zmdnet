@@ -196,9 +196,9 @@ add_library(zmdnet SHARED ${zmdnet_sources} ${zmdnet_headers})
 add_library(zmdnet-static STATIC ${zmdnet_sources} ${zmdnet_headers})
 
 if (WIN32)
-	message(STATUS "link library: ws2_32")
 	target_link_libraries(zmdnet ws2_32)
 	target_link_libraries(zmdnet-static ws2_32)
+	message(STATUS "link library: ws2_32 done")
 endif ()
 
 target_link_libraries(zmdnet  "${CMAKE_SOURCE_DIR}/thirdparty/libs/sodiumlib/lib/v141/dynamic/libsodium.lib")
