@@ -303,26 +303,27 @@ endif ()
 CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/config.h.in ${CMAKE_REQUIRED_INCLUDES}/config.h)
 
 # build sodium library
-#execute_process(COMMAND git pull WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
-message(STATUS "git pull sodium done")
+message(STATUS "Git pull remote sodium")
+execute_process(COMMAND git pull WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} OUTPUT_VARIABLE RET)
 
-  if (WIN32)
-	#execute_process(COMMAND  buildall.bat WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/thirdparty/sodium/builds/msvc/build)
+if (WIN32)
+	execute_process(COMMAND  buildall.bat WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/thirdparty/sodium/builds/msvc/build)
 	message(STATUS "run sodium buildall.bat done ")
-	#execute_process(COMMAND  xcopy /s /e /i /y  .\\thirdparty\\sodium\\src\\libsodium\\include .\\thirdparty\\libs\\sodiumlib\\include WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+	execute_process(COMMAND  xcopy /s /e /i /y  .\\thirdparty\\sodium\\src\\libsodium\\include .\\thirdparty\\libs\\sodiumlib\\include WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 	message(STATUS "copy sodium include headers done")
-	#execute_process(COMMAND  xcopy /s /e /i /y  .\\thirdparty\\sodium\\bin\\x64\\release .\\thirdparty\\libs\\sodiumlib\\lib WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+	execute_process(COMMAND  xcopy /s /e /i /y  .\\thirdparty\\sodium\\bin\\x64\\release .\\thirdparty\\libs\\sodiumlib\\lib WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 	message(STATUS "copy sodium lib done ")
 else ()
-	message(STATUS "run sodium autogen.sh")
-	#execute_process(COMMAND ./autogen.sh WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/thirdparty/sodium)
-	message(STATUS "run sodium configure")
-	#execute_process(COMMAND ./configure --prefix=${PROJECT_SOURCE_DIR}/thirdparty/libs/sodiumlib --sysconfdir=/etc  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/thirdparty/sodium)
-	#execute_process(COMMAND make install WORKING_DIRECTORY ./thirdparty/sodium)
+	execute_process(COMMAND ./autogen.sh WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/thirdparty/sodium)
+	message(STATUS "run sodium autogen.sh done")
+	execute_process(COMMAND ./configure --prefix=${PROJECT_SOURCE_DIR}/thirdparty/libs/sodiumlib --sysconfdir=/etc  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/thirdparty/sodium)
+	message(STATUS "run sodium configure done")
+	execute_process(COMMAND make install WORKING_DIRECTORY ./thirdparty/sodium)
+	message(STATUS "run sodium make install done")
 endif()
 
-# execute_process(COMMAND sudo chmod 777 -R .
-#   WORKING_DIRECTORY ./thirdparty/)
+# execute_process(COMMAND sudo chmod 777 -R . WORKING_DIRECTORY ./thirdparty/)
+
 #################################################
 # INCLUDE SUBDIRS
 #################################################

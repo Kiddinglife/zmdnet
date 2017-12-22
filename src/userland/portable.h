@@ -512,8 +512,6 @@ int win_if_nametoindex(const char *);
 #include <sys/filedesc.h>
 #endif
 
-// #include "zmdnet-sha1.h" //TODO
-
 #if __FreeBSD_version >= 700000
 #include <netinet/ip_options.h>
 #endif
@@ -554,9 +552,12 @@ int win_if_nametoindex(const char *);
     ((ro)->ro_rt != NULL ? (ro)->ro_rt->rt_ifp : NULL)
 #define ZMDNET_ROUTE_HAS_VALID_IFN(ro) \
     ((ro)->ro_rt && (ro)->ro_rt->rt_ifp)
-/******************************************/
 
-#define ZMDNET_GET_IF_INDEX_FROM_ROUTE(ro) 1 /* compiles...  TODO use routing socket to determine this is conected to another todo zmdnet_rtalloc() in route.h */
+/* compiles...  TODO use routing socket to determine
+ * this is conected to another todo zmdnet_rtalloc() in route.h
+ */
+#define ZMDNET_GET_IF_INDEX_FROM_ROUTE(ro) 1
+
 // use geconet typeofaddr() this is not cjeck sitelock and linklocal for ipv6
 #ifdef _WIN32
 #define is_ift_loopback(ifn) (strncmp((ifn)->ifn_name, "lo", 2) == 0)
